@@ -25,6 +25,8 @@ public class Test {
 				System.out.println("索引已存在");
 			}
 
+			// boolean success = ElasticsearchUtils.createIndex(client, index);
+
 			// 新增数据
 			// Map<String, Object> map = new HashMap<>();
 			// map.put("name", "test1");
