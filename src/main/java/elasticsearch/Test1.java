@@ -3,6 +3,7 @@ package elasticsearch;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -18,13 +19,17 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -70,17 +75,18 @@ public class Test1 {
 			// 新增数据
 			List<Person> personList = new ArrayList<>();
 			for (int i = 1; i <= 10; i++) {
-				Person p = new Person();
-				p.setId(i + "");
-				p.setName("test " + i);
-				p.setAge(10 + i);
-				p.setBirthday(DateUtils.addDays(new Date(), RandomUtils.nextInt(1, 1000) - 2000));
+				Person person = new Person();
+				person.setId(i + "");
+				person.setName("test " + i);
+				person.setSex(i % 2 + 1);
+				person.setAge(10 + i);
+				person.setBirthday(DateUtils.addDays(new Date(), RandomUtils.nextInt(1, 1000) - 2000));
 				if (i % 2 == 0) {
-					p.setMark("这个是中国人");
+					person.setMark("这个是中国人");
 				} else {
-					p.setMark("这个是美国人");
+					person.setMark("这个是美国人");
 				}
-				personList.add(p);
+				personList.add(person);
 			}
 
 			BulkRequest bulkRequest = new BulkRequest();
@@ -90,24 +96,50 @@ public class Test1 {
 				indexRequest.type(type);
 				indexRequest.id(person.getId());
 				indexRequest.source(JSONObject.toJSONString(person), XContentType.JSON);
+				// indexRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);// 强制同步操作
 				bulkRequest.add(indexRequest);
 			}
+			bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);// 强制同步操作
 			BulkResponse bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
 			for (BulkItemResponse bulkItemResponse : bulkResponse.getItems()) {
 				System.out.println(bulkItemResponse.getResponse().getId());
 			}
 
+			// Thread.sleep(5000L);
+
 			// 查询数据
-			SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-			sourceBuilder.from(0);
-			sourceBuilder.size(10);
+			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+			searchSourceBuilder.from(0);
+			searchSourceBuilder.size(10);
+			searchSourceBuilder.fetchSource(new String[] { "name", "mark" }, null);
 			MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("mark", "中国");
-			sourceBuilder.query(matchQueryBuilder);
+			searchSourceBuilder.query(matchQueryBuilder);
+			// 高亮
+			HighlightBuilder highlightBuilder = new HighlightBuilder();
+			highlightBuilder.preTags("<strong>");// 设置前缀
+			highlightBuilder.postTags("</strong>");// 设置后缀
+			highlightBuilder.field("mark");// 设置高亮字段
+			searchSourceBuilder.highlighter(highlightBuilder);
+
 			SearchRequest searchRequest = new SearchRequest(index);
 			searchRequest.types(type);
-			searchRequest.source(sourceBuilder);
+			searchRequest.source(searchSourceBuilder);
 			SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-			System.out.println(response);
+			System.out.println(response.toString());
+			if (response.getHits().totalHits > 0) {
+				for (SearchHit item : response.getHits().getHits()) {
+					Map<String, Object> map = item.getSourceAsMap();
+					if (null != item.getHighlightFields()) {
+						for (String field : item.getHighlightFields().keySet()) {
+							Text[] texts = item.getHighlightFields().get(field).getFragments();
+							map.put(field, texts[0]);
+						}
+						System.out.println(map);
+					}
+					// System.out.println(item.getHighlightFields());
+					// System.out.println(item.getSourceAsString());
+				}
+			}
 
 			// 删除index
 			DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
