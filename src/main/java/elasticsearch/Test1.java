@@ -48,7 +48,7 @@ public class Test1 {
 			String index = "test2";
 			String type = "_doc";
 
-			String mappings = FileUtils.readFile("src/main/java/elasticsearch/test1_mapping.json", "utf-8");
+			String mappings = FileUtils.readFile("src/main/java/dataobject/person_mapping.json", "utf-8");
 			System.out.println(mappings);
 
 			// 连接elasticsearch

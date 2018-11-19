@@ -1,4 +1,4 @@
-package elasticsearch;
+package elasticsearch.common;
 
 import java.io.IOException;
 import java.util.List;

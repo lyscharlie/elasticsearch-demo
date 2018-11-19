@@ -11,6 +11,8 @@ import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
+import elasticsearch.common.ElasticsearchUtils;
+
 public class Test {
 
 	public static void main(String[] args) {
