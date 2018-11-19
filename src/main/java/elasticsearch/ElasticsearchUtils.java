@@ -1,6 +1,7 @@
 package elasticsearch;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -8,6 +9,9 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -109,7 +113,10 @@ public class ElasticsearchUtils {
 	 */
 	public static String addData(RestHighLevelClient client, String index, String type, String id, Object object) {
 		try {
-			IndexRequest request = new IndexRequest(index, type, id);
+			// IndexRequest request = new IndexRequest(index, type, id);
+			IndexRequest request = new IndexRequest();
+			request.index(index);
+			request.type(type);
 			request.source(JSONObject.toJSONString(object), XContentType.JSON);
 			IndexResponse indexResponse = client.index(request, RequestOptions.DEFAULT);
 			return indexResponse.getId();
@@ -119,6 +126,50 @@ public class ElasticsearchUtils {
 		return null;
 	}
 
+	/**
+	 * 批量添加
+	 * 
+	 * @param <T>
+	 * 
+	 * @param client
+	 * @param index
+	 * @param type
+	 * @param objectList
+	 * @return
+	 */
+	public static <T> String addBulkDatas(RestHighLevelClient client, String index, String type, List<T> objectList) {
+		try {
+			BulkRequest bulkRequest = new BulkRequest();
+			for (Object object : objectList) {
+				IndexRequest indexRequest = new IndexRequest();
+				indexRequest.index(index);
+				indexRequest.type(type);
+				indexRequest.source(JSONObject.toJSONString(object), XContentType.JSON);
+				bulkRequest.add(indexRequest);
+			}
+			BulkResponse response = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+
+			for (BulkItemResponse bulkItemResponse : response.getItems()) {
+				System.out.println(bulkItemResponse.getResponse().getId());
+			}
+			System.out.println(JSONObject.toJSON(response));
+
+			return response.toString();
+		} catch (Exception e) {
+			logger.error("ElasticsearchUtils.addBulkDatas", e);
+		}
+		return null;
+	}
+
+	/**
+	 * 根据主键查询数据
+	 * 
+	 * @param client
+	 * @param index
+	 * @param type
+	 * @param id
+	 * @return
+	 */
 	public static String getDataById(RestHighLevelClient client, String index, String type, String id) {
 		try {
 			GetRequest request = new GetRequest();
@@ -133,6 +184,15 @@ public class ElasticsearchUtils {
 		return null;
 	}
 
+	/**
+	 * 查询
+	 * 
+	 * @param client
+	 * @param index
+	 * @param type
+	 * @param sourceBuilder
+	 * @return
+	 */
 	public static String query(RestHighLevelClient client, String index, String type, SearchSourceBuilder sourceBuilder) {
 		try {
 			SearchRequest searchRequest = new SearchRequest(index);
@@ -146,4 +206,11 @@ public class ElasticsearchUtils {
 		return null;
 	}
 
+	public static void deleteById() {
+
+	}
+
+	public static void deleteByQuery() {
+
+	}
 }
