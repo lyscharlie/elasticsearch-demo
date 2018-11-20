@@ -36,7 +36,7 @@ import elasticsearch.common.ElasticsearchClientFactory;
 public class MatchQueryBuilderTest {
 
 	public static void main(String[] args) {
-		String keyword = "马克华菲";
+		String keyword = "羽绒服";
 
 		List<String> words = new ArrayList<String>();
 		words.add("韩都衣舍韩版2014秋冬新款女装蝙蝠袖连帽长袖连衣裙");

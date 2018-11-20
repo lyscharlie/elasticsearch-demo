@@ -19,7 +19,7 @@
 			"type": "text",
 			"index": true,
 			"analyzer": "ik_max_word",
-			"search_analyzer": "ik_max_word"
+			"search_analyzer": "ik_smart"
 		}
 	}
 }
