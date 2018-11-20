@@ -27,7 +27,7 @@ import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchClientFactory;
 
 /**
- * 短语匹配
+ * 短语搜索（不适用中文）
  * 
  * @author liyishi
  *
