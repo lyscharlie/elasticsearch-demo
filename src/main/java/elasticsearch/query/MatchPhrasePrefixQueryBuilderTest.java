@@ -14,7 +14,7 @@ import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
+import org.elasticsearch.index.query.MatchPhrasePrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -27,15 +27,15 @@ import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchClientFactory;
 
 /**
- * 短语匹配
+ * 短语搜索（不适用中文）
  * 
  * @author liyishi
  *
  */
-public class MatchPhraseQueryBuilderTest {
+public class MatchPhrasePrefixQueryBuilderTest {
 
 	public static void main(String[] args) {
-		String keyword = "easily";
+		String keyword = "Kibana Elasticsearch";
 
 		List<String> words = new ArrayList<String>();
 		words.add("Expert Tips When Migrating to Elastic Cloud Enterprise (ECE)");
@@ -90,7 +90,7 @@ public class MatchPhraseQueryBuilderTest {
 			}
 
 			// 查询数据
-			MatchPhraseQueryBuilder matchAllQueryBuilder = QueryBuilders.matchPhraseQuery("desc", keyword);
+			MatchPhrasePrefixQueryBuilder matchPhrasePrefixQueryBuilder = QueryBuilders.matchPhrasePrefixQuery("desc", keyword);
 
 			// 高亮
 			HighlightBuilder highlightBuilder = new HighlightBuilder();
@@ -101,7 +101,7 @@ public class MatchPhraseQueryBuilderTest {
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 			searchSourceBuilder.from(0);
 			searchSourceBuilder.size(10);
-			searchSourceBuilder.query(matchAllQueryBuilder);
+			searchSourceBuilder.query(matchPhrasePrefixQueryBuilder);
 			searchSourceBuilder.highlighter(highlightBuilder);
 			System.out.println(searchSourceBuilder);
 
