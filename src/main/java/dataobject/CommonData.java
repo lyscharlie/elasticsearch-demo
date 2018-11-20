@@ -8,6 +8,8 @@ public class CommonData {
 
 	private String desc;
 
+	private String mark;
+
 	private Integer number;
 
 	private Date time;
@@ -26,6 +28,14 @@ public class CommonData {
 
 	public void setDesc(String desc) {
 		this.desc = desc;
+	}
+
+	public String getMark() {
+		return mark;
+	}
+
+	public void setMark(String mark) {
+		this.mark = mark;
 	}
 
 	public Integer getNumber() {
