@@ -1,4 +1,4 @@
-package elasticsearch.query;
+package elasticsearch.query.full_text_query;
 
 import java.util.ArrayList;
 import java.util.Date;
