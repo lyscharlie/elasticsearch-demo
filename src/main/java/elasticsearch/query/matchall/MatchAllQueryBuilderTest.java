@@ -1,4 +1,4 @@
-package elasticsearch.query.full_text_query;
+package elasticsearch.query.matchall;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,11 +14,10 @@ import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.MatchPhrasePrefixQueryBuilder;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -27,24 +26,28 @@ import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchClientFactory;
 
 /**
- * 短语搜索（不适用中文）
+ * 全匹配
  * 
  * @author liyishi
  *
  */
-public class MatchPhrasePrefixQueryBuilderTest {
+public class MatchAllQueryBuilderTest {
 
 	public static void main(String[] args) {
-		String keyword = "Kibana Elasticsearch";
-
 		List<String> words = new ArrayList<String>();
-		words.add("Expert Tips When Migrating to Elastic Cloud Enterprise (ECE)");
-		words.add("Building Effective Dashboards with Kibana and Elasticsearch");
-		words.add("Intro to Canvas: A new way to tell visual stories in Kibana");
-		words.add("Learn how to easily navigate a migration, and avoid common mistakes by adopting these simple, insightful tips.");
-		words.add("Feel free to forward this invite to any colleagues");
-		words.add("Learn to build visualizations quickly, easily, and effectively using Kibana and the Elastic Stack. ");
-		words.add("Join this webinar to learn how you can start creating custom, infographic-style presentations with your live Elasticsearch data.");
+		words.add("韩都衣舍韩版2014秋冬新款女装蝙蝠袖连帽长袖连衣裙");
+		words.add("女装 长绒拉链连帽运动开衫 126418 优衣库");
+		words.add("【懒猫洗衣】运动鞋/休闲鞋清洗保养3双 免费上门取送");
+		words.add("[Midea/美的]美的蒸汽挂烫机正品 家用双杆挂式电熨斗熨");
+		words.add("马克华菲羽绒服男士韩版羽绒外套 精选白鸭绒足量填充");
+		words.add("马克华菲羽绒服女士韩版羽绒外套 精选白鸭绒足量填充");
+		words.add("马克华菲羽绒服老年韩版羽绒外套 精选白鸭绒足量填充");
+		words.add("[Omega/欧米茄]蝶飞经典机械男表");
+		words.add("七度空间优雅丝柔12包组合 定制专供 加量不加价");
+		words.add("[温碧泉]透芯润五件套+送金稻定制蒸脸仪+旅行套+面膜");
+		words.add("[SHUA/舒华]倒立机 腰椎颈椎牵引器 拉伸增高倒挂机");
+		words.add("泸州老窖 60°泸州老窖泸州原浆珍品1500ml 三斤大坛酒");
+		words.add("翠苑街道文三路477号华星科技大厦");
 
 		List<CommonData> dataList = new ArrayList<>();
 		for (int i = 0; i < words.size(); i++) {
@@ -89,20 +92,12 @@ public class MatchPhrasePrefixQueryBuilderTest {
 				System.out.println(bulkItemResponse.getResponse().getId());
 			}
 
+			// 查询全部
+			MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
+
 			// 查询数据
-			MatchPhrasePrefixQueryBuilder matchPhrasePrefixQueryBuilder = QueryBuilders.matchPhrasePrefixQuery("desc", keyword);
-
-			// 高亮
-			HighlightBuilder highlightBuilder = new HighlightBuilder();
-			highlightBuilder.preTags("<strong>");// 设置前缀
-			highlightBuilder.postTags("</strong>");// 设置后缀
-			highlightBuilder.field("desc");// 设置高亮字段
-
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-			searchSourceBuilder.from(0);
-			searchSourceBuilder.size(10);
-			searchSourceBuilder.query(matchPhrasePrefixQueryBuilder);
-			searchSourceBuilder.highlighter(highlightBuilder);
+			searchSourceBuilder.query(matchAllQueryBuilder);
 			System.out.println(searchSourceBuilder);
 
 			SearchRequest searchRequest = new SearchRequest(index);
@@ -113,8 +108,7 @@ public class MatchPhrasePrefixQueryBuilderTest {
 			System.out.println(response.toString());
 			if (response.getHits().totalHits > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
-					System.out.println(item.getScore() + "==>" + item.getHighlightFields());
-					System.out.println(item.getSourceAsString());
+					System.out.println(item.getScore() + "==>" + item.getSourceAsString());
 				}
 			}
 

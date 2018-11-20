@@ -1,4 +1,4 @@
-package elasticsearch.query.match_all_query;
+package elasticsearch.query.fulltext;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,10 +14,12 @@ import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -26,14 +28,16 @@ import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchClientFactory;
 
 /**
- * 全匹配
+ * 分词匹配
  * 
  * @author liyishi
  *
  */
-public class MatchAllQueryBuilderTest {
+public class MatchQueryBuilderTest {
 
 	public static void main(String[] args) {
+		String keyword = "羽绒服";
+
 		List<String> words = new ArrayList<String>();
 		words.add("韩都衣舍韩版2014秋冬新款女装蝙蝠袖连帽长袖连衣裙");
 		words.add("女装 长绒拉链连帽运动开衫 126418 优衣库");
@@ -92,12 +96,22 @@ public class MatchAllQueryBuilderTest {
 				System.out.println(bulkItemResponse.getResponse().getId());
 			}
 
-			// 查询全部
-			MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
+			// 关键字
+			MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("desc", keyword);
+			matchQueryBuilder.operator(Operator.AND);
+
+			// 高亮
+			HighlightBuilder highlightBuilder = new HighlightBuilder();
+			highlightBuilder.preTags("<strong>");// 设置前缀
+			highlightBuilder.postTags("</strong>");// 设置后缀
+			highlightBuilder.field("desc");// 设置高亮字段
 
 			// 查询数据
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-			searchSourceBuilder.query(matchAllQueryBuilder);
+			searchSourceBuilder.from(0);
+			searchSourceBuilder.size(10);
+			searchSourceBuilder.query(matchQueryBuilder);
+			searchSourceBuilder.highlighter(highlightBuilder);
 			System.out.println(searchSourceBuilder);
 
 			SearchRequest searchRequest = new SearchRequest(index);
@@ -108,7 +122,8 @@ public class MatchAllQueryBuilderTest {
 			System.out.println(response.toString());
 			if (response.getHits().totalHits > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
-					System.out.println(item.getScore() + "==>" + item.getSourceAsString());
+					System.out.println(item.getScore() + "==>" + item.getHighlightFields());
+					System.out.println(item.getSourceAsString());
 				}
 			}
 
