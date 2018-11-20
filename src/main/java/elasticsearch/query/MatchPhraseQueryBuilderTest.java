@@ -14,10 +14,11 @@ import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.MatchPhraseQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 
 import com.alibaba.fastjson.JSONObject;
 
@@ -26,19 +27,22 @@ import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchClientFactory;
 
 /**
- * 全匹配
+ * 分词匹配
  * 
  * @author liyishi
  *
  */
-public class MatchAllQueryBuilderTest {
+public class MatchPhraseQueryBuilderTest {
 
 	public static void main(String[] args) {
+		String keyword = "羽绒外套";
+
 		List<String> words = new ArrayList<String>();
 		words.add("韩都衣舍韩版2014秋冬新款女装蝙蝠袖连帽长袖连衣裙");
 		words.add("女装 长绒拉链连帽运动开衫 126418 优衣库");
 		words.add("【懒猫洗衣】运动鞋/休闲鞋清洗保养3双 免费上门取送");
 		words.add("[Midea/美的]美的蒸汽挂烫机正品 家用双杆挂式电熨斗熨");
+		words.add("马克华菲羽绒服儿童韩版羽绒外套 精选白鸭绒足量填充");
 		words.add("马克华菲羽绒服男士韩版羽绒外套 精选白鸭绒足量填充");
 		words.add("马克华菲羽绒服女士韩版羽绒外套 精选白鸭绒足量填充");
 		words.add("马克华菲羽绒服老年韩版羽绒外套 精选白鸭绒足量填充");
@@ -92,12 +96,20 @@ public class MatchAllQueryBuilderTest {
 				System.out.println(bulkItemResponse.getResponse().getId());
 			}
 
-			// 查询全部
-			MatchAllQueryBuilder matchAllQueryBuilder = QueryBuilders.matchAllQuery();
-
 			// 查询数据
+			MatchPhraseQueryBuilder matchAllQueryBuilder = QueryBuilders.matchPhraseQuery("desc", keyword);
+
+			// 高亮
+			HighlightBuilder highlightBuilder = new HighlightBuilder();
+			highlightBuilder.preTags("<strong>");// 设置前缀
+			highlightBuilder.postTags("</strong>");// 设置后缀
+			highlightBuilder.field("desc");// 设置高亮字段
+
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+			searchSourceBuilder.from(0);
+			searchSourceBuilder.size(10);
 			searchSourceBuilder.query(matchAllQueryBuilder);
+			searchSourceBuilder.highlighter(highlightBuilder);
 			System.out.println(searchSourceBuilder);
 
 			SearchRequest searchRequest = new SearchRequest(index);
@@ -108,7 +120,8 @@ public class MatchAllQueryBuilderTest {
 			System.out.println(response.toString());
 			if (response.getHits().totalHits > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
-					System.out.println(item.getScore() + "==>" + item.getSourceAsString());
+					System.out.println(item.getScore() + "==>" + item.getHighlightFields());
+					System.out.println(item.getSourceAsString());
 				}
 			}
 

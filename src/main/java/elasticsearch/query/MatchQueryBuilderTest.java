@@ -27,6 +27,12 @@ import common.FileUtils;
 import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchClientFactory;
 
+/**
+ * 分词匹配
+ * 
+ * @author liyishi
+ *
+ */
 public class MatchQueryBuilderTest {
 
 	public static void main(String[] args) {
@@ -90,23 +96,22 @@ public class MatchQueryBuilderTest {
 				System.out.println(bulkItemResponse.getResponse().getId());
 			}
 
-			// 查询数据
-			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-			searchSourceBuilder.from(0);
-			searchSourceBuilder.size(10);
-
 			// 关键字
 			MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("desc", keyword);
 			matchQueryBuilder.operator(Operator.AND);
-			searchSourceBuilder.query(matchQueryBuilder);
 
 			// 高亮
 			HighlightBuilder highlightBuilder = new HighlightBuilder();
 			highlightBuilder.preTags("<strong>");// 设置前缀
 			highlightBuilder.postTags("</strong>");// 设置后缀
 			highlightBuilder.field("desc");// 设置高亮字段
-			searchSourceBuilder.highlighter(highlightBuilder);
 
+			// 查询数据
+			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+			searchSourceBuilder.from(0);
+			searchSourceBuilder.size(10);
+			searchSourceBuilder.query(matchQueryBuilder);
+			searchSourceBuilder.highlighter(highlightBuilder);
 			System.out.println(searchSourceBuilder);
 
 			SearchRequest searchRequest = new SearchRequest(index);

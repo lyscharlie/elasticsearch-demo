@@ -18,6 +18,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -109,16 +110,20 @@ public class ElasticsearchUtils {
 	 * @param index
 	 * @param type
 	 * @param object
+	 * @param sync
+	 *            是否同步
 	 * @return
 	 */
-	public static String addData(RestHighLevelClient client, String index, String type, String id, Object object) {
+	public static String addData(RestHighLevelClient client, String index, String type, String id, Object object, boolean sync) {
 		try {
-			// IndexRequest request = new IndexRequest(index, type, id);
-			IndexRequest request = new IndexRequest();
-			request.index(index);
-			request.type(type);
-			request.source(JSONObject.toJSONString(object), XContentType.JSON);
-			IndexResponse indexResponse = client.index(request, RequestOptions.DEFAULT);
+			IndexRequest indexRequest = new IndexRequest(index, type, id);
+			indexRequest.index(index);
+			indexRequest.type(type);
+			indexRequest.source(JSONObject.toJSONString(object), XContentType.JSON);
+			if (sync) {
+				indexRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
+			}
+			IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
 			return indexResponse.getId();
 		} catch (Exception e) {
 			logger.error("ElasticsearchUtils.addData", e);
@@ -135,9 +140,11 @@ public class ElasticsearchUtils {
 	 * @param index
 	 * @param type
 	 * @param objectList
+	 * @param sync
+	 *            是否同步
 	 * @return
 	 */
-	public static <T> String addBulkDatas(RestHighLevelClient client, String index, String type, List<T> objectList) {
+	public static <T> String addBulkDatas(RestHighLevelClient client, String index, String type, List<T> objectList, boolean sync) {
 		try {
 			BulkRequest bulkRequest = new BulkRequest();
 			for (Object object : objectList) {
@@ -146,6 +153,9 @@ public class ElasticsearchUtils {
 				indexRequest.type(type);
 				indexRequest.source(JSONObject.toJSONString(object), XContentType.JSON);
 				bulkRequest.add(indexRequest);
+			}
+			if (sync) {
+				bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
 			}
 			BulkResponse response = client.bulk(bulkRequest, RequestOptions.DEFAULT);
 

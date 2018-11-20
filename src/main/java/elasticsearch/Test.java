@@ -43,7 +43,7 @@ public class Test {
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", "test 1");
 			map.put("count", RandomUtils.nextInt(0, 100));
-			String id = ElasticsearchUtils.addData(client, index, type, "1", map);
+			String id = ElasticsearchUtils.addData(client, index, type, "1", map, true);
 			System.out.println(id);
 
 			// 单个查询
@@ -59,7 +59,7 @@ public class Test {
 				dataMap.put("count", RandomUtils.nextInt(0, 100));
 				mapList.add(dataMap);
 			}
-			String result3 = ElasticsearchUtils.addBulkDatas(client, index, type, mapList);
+			String result3 = ElasticsearchUtils.addBulkDatas(client, index, type, mapList, true);
 			System.out.println(result3);
 
 			// 查询

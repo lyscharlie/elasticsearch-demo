@@ -107,19 +107,23 @@ public class Test1 {
 
 			// Thread.sleep(5000L);
 
-			// 查询数据
-			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-			searchSourceBuilder.from(0);
-			searchSourceBuilder.size(10);
-			searchSourceBuilder.fetchSource(new String[] { "name", "mark" }, null);
+			// 关键词查询数据
 			MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("mark", "中国");
-			searchSourceBuilder.query(matchQueryBuilder);
+
 			// 高亮
 			HighlightBuilder highlightBuilder = new HighlightBuilder();
 			highlightBuilder.preTags("<strong>");// 设置前缀
 			highlightBuilder.postTags("</strong>");// 设置后缀
 			highlightBuilder.field("mark");// 设置高亮字段
+
+			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+			searchSourceBuilder.from(0);
+			searchSourceBuilder.size(10);
+			searchSourceBuilder.fetchSource(new String[] { "name", "mark" }, null);
+			searchSourceBuilder.query(matchQueryBuilder);
 			searchSourceBuilder.highlighter(highlightBuilder);
+
+			System.out.println(searchSourceBuilder);
 
 			SearchRequest searchRequest = new SearchRequest(index);
 			searchRequest.types(type);
