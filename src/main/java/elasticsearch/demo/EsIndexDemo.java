@@ -91,13 +91,12 @@ public class EsIndexDemo {
 		sourceBuilder.query(boolBuilder);
 		// System.out.println(sourceBuilder);
 		SearchRequest searchRequest = new SearchRequest("test3");
-		searchRequest.types("doc");
 		searchRequest.source(sourceBuilder);
 		SearchResponse response = null;
 		try {
 			response = client.search(searchRequest, RequestOptions.DEFAULT);
 			SearchHits hits = response.getHits();
-			int totalRecordNum = (int) hits.getTotalHits();
+			long totalRecordNum = hits.getTotalHits().value;
 			System.out.println(totalRecordNum);
 			JSONObject json = new JSONObject();
 			json.put("date", "1995-05-16");

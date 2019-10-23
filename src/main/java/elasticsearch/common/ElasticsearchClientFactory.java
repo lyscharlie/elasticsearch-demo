@@ -4,25 +4,24 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ElasticsearchClientFactory {
-
-	private static Logger logger = LoggerFactory.getLogger(ElasticsearchClientFactory.class);
 
 	/**
 	 * 初始化客户端
-	 * 
+	 *
 	 * @param scheme
 	 * @param host
 	 * @param port
@@ -36,25 +35,24 @@ public class ElasticsearchClientFactory {
 	 * 创建索引
 	 *
 	 * @param index（index名必须全小写，否则报错）
-	 * @param type
 	 * @param mappings
 	 * @return
 	 */
-	public static boolean createIndex(RestHighLevelClient client, String index, String type, String mappings) {
+	public static boolean createIndex(RestHighLevelClient client, String index, String mappings) {
 		try {
 			CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
-			if (StringUtils.isNoneBlank(type, mappings)) {
-				createIndexRequest.mapping(type, mappings, XContentType.JSON);
+			if (StringUtils.isNotBlank(mappings)) {
+				createIndexRequest.mapping(mappings, XContentType.JSON);
 			}
 			CreateIndexResponse createIndexResponse = client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
 			if (createIndexResponse.isAcknowledged()) {
-				logger.info("创建索引成功");
+				log.info("创建索引成功");
 			} else {
-				logger.info("创建索引失败");
+				log.info("创建索引失败");
 			}
 			return createIndexResponse.isAcknowledged();
 		} catch (IOException e) {
-			logger.error("ElasticsearchClientFactory.createIndex", e);
+			log.error("ElasticsearchClientFactory.createIndex", e);
 		}
 
 		return false;
@@ -62,25 +60,24 @@ public class ElasticsearchClientFactory {
 
 	/**
 	 * 检查索引
-	 * 
+	 *
 	 * @param index
 	 * @return
 	 * @throws IOException
 	 */
 	public static boolean checkIndexExist(RestHighLevelClient client, String index) {
 		try {
-			GetIndexRequest GetIndexRequest = new GetIndexRequest();
-			GetIndexRequest.indices(index);
-			return client.indices().exists(GetIndexRequest, RequestOptions.DEFAULT);
+			GetIndexRequest request = new GetIndexRequest(index);
+			return client.indices().exists(request, RequestOptions.DEFAULT);
 		} catch (IOException e) {
-			logger.error("ElasticsearchClientFactory.checkIndexExist", e);
+			log.error("ElasticsearchClientFactory.checkIndexExist", e);
 		}
 		return false;
 	}
 
 	/**
 	 * 删除索引
-	 * 
+	 *
 	 * @param client
 	 * @param index
 	 * @return
@@ -88,10 +85,10 @@ public class ElasticsearchClientFactory {
 	public static boolean deleteIndex(RestHighLevelClient client, String index) {
 		try {
 			DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
-			DeleteIndexResponse deleteIndexResponse = client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
-			return deleteIndexResponse.isAcknowledged();
+			AcknowledgedResponse response = client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
+			return response.isAcknowledged();
 		} catch (IOException e) {
-			logger.error("ElasticsearchClientFactory.deleteIndex", e);
+			log.error("ElasticsearchClientFactory.deleteIndex", e);
 		}
 		return false;
 	}

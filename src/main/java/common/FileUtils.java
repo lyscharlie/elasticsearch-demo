@@ -7,21 +7,20 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 读写文件工具类
- * 
+ *
  * @author LiYishi
  */
+@Slf4j
 public class FileUtils {
-
-	private static Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
 	/**
 	 * 读取文件
-	 * 
+	 *
 	 * @param path
 	 * @param charset
 	 * @return
@@ -44,11 +43,11 @@ public class FileUtils {
 				String text = sb.toString();
 				text = StringUtils.replace(text, " ", "");
 			} else {
-				logger.error("找不到指定的文件：" + path);
+				log.error("找不到指定的文件：" + path);
 			}
 
 		} catch (Exception e) {
-			logger.error("读取文件内容出错", e);
+			log.error("读取文件内容出错", e);
 		}
 
 		return sb.toString();
@@ -56,7 +55,7 @@ public class FileUtils {
 
 	/**
 	 * 写文件
-	 * 
+	 *
 	 * @param path
 	 * @param text
 	 * @param charset
@@ -74,11 +73,11 @@ public class FileUtils {
 			out.write(text.getBytes(charset));// 注意需要转换对应的字符集
 			out.close();
 
-			logger.info("写文件完成：" + path);
+			log.info("写文件完成：" + path);
 
 			return true;
 		} catch (Exception e) {
-			logger.error("写入文件内容出错", e);
+			log.error("写入文件内容出错", e);
 			return false;
 		}
 	}

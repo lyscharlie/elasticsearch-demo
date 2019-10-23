@@ -27,9 +27,8 @@ import elasticsearch.common.ElasticsearchClientFactory;
 
 /**
  * 全匹配
- * 
- * @author liyishi
  *
+ * @author liyishi
  */
 public class MatchAllQueryBuilderTest {
 
@@ -65,7 +64,6 @@ public class MatchAllQueryBuilderTest {
 			int port = 9200;
 
 			String index = "demo_test";
-			String type = "_doc";
 
 			String mappings = FileUtils.readFile("src/main/java/dataobject/common_data_mapping.json", "utf-8");
 
@@ -74,7 +72,7 @@ public class MatchAllQueryBuilderTest {
 
 			// 创建index
 			if (!ElasticsearchClientFactory.checkIndexExist(client, index)) {
-				ElasticsearchClientFactory.createIndex(client, index, type, mappings);
+				ElasticsearchClientFactory.createIndex(client, index, mappings);
 			}
 
 			// 批量添加数据
@@ -82,7 +80,6 @@ public class MatchAllQueryBuilderTest {
 			for (CommonData data : dataList) {
 				IndexRequest indexRequest = new IndexRequest();
 				indexRequest.index(index);
-				indexRequest.type(type);
 				indexRequest.source(JSONObject.toJSONString(data), XContentType.JSON);
 				bulkRequest.add(indexRequest);
 			}
@@ -101,12 +98,11 @@ public class MatchAllQueryBuilderTest {
 			System.out.println(searchSourceBuilder);
 
 			SearchRequest searchRequest = new SearchRequest(index);
-			searchRequest.types(type);
 			searchRequest.source(searchSourceBuilder);
 
 			SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
 			System.out.println(response.toString());
-			if (response.getHits().totalHits > 0) {
+			if (response.getHits().getTotalHits().value > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
 					System.out.println(item.getScore() + "==>" + item.getSourceAsString());
 				}

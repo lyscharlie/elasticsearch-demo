@@ -11,7 +11,6 @@ import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -20,6 +19,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -46,7 +46,6 @@ public class Test1 {
 			int port = 9200;
 
 			String index = "test2";
-			String type = "_doc";
 
 			String mappings = FileUtils.readFile("src/main/java/dataobject/person_mapping.json", "utf-8");
 			System.out.println(mappings);
@@ -61,7 +60,7 @@ public class Test1 {
 				System.out.println("索引" + index + "已创建");
 			} else {
 				CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
-				createIndexRequest.mapping(type, mappings, XContentType.JSON);
+				createIndexRequest.mapping(mappings, XContentType.JSON);
 				CreateIndexResponse createIndexResponse = client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
 				if (createIndexResponse.isAcknowledged()) {
 					System.out.println("创建索引成功");
@@ -93,7 +92,6 @@ public class Test1 {
 			for (Person person : personList) {
 				IndexRequest indexRequest = new IndexRequest();
 				indexRequest.index(index);
-				indexRequest.type(type);
 				indexRequest.id(person.getId());
 				indexRequest.source(JSONObject.toJSONString(person), XContentType.JSON);
 				// indexRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);// 强制同步操作
@@ -119,18 +117,17 @@ public class Test1 {
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 			searchSourceBuilder.from(0);
 			searchSourceBuilder.size(10);
-			searchSourceBuilder.fetchSource(new String[] { "name", "mark" }, null);
+			searchSourceBuilder.fetchSource(new String[]{"name", "mark"}, null);
 			searchSourceBuilder.query(matchQueryBuilder);
 			searchSourceBuilder.highlighter(highlightBuilder);
 
 			System.out.println(searchSourceBuilder);
 
 			SearchRequest searchRequest = new SearchRequest(index);
-			searchRequest.types(type);
 			searchRequest.source(searchSourceBuilder);
 			SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
 			System.out.println(response.toString());
-			if (response.getHits().totalHits > 0) {
+			if (response.getHits().getTotalHits().value > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
 					Map<String, Object> map = item.getSourceAsMap();
 					if (null != item.getHighlightFields()) {
@@ -147,8 +144,8 @@ public class Test1 {
 
 			// 删除index
 			DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
-			DeleteIndexResponse deleteIndexResponse = client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
-			if (deleteIndexResponse.isAcknowledged()) {
+			AcknowledgedResponse acknowledgedResponse = client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
+			if (acknowledgedResponse.isAcknowledged()) {
 				System.out.println("删除索引成功");
 			} else {
 				System.out.println("删除索引失败");
