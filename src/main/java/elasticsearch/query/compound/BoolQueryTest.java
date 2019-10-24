@@ -15,6 +15,9 @@ import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
+/**
+ * 组合多个叶子或复合查询子句的默认查询
+ */
 public class BoolQueryTest {
 
 	public static void main(String[] args) {
@@ -24,6 +27,8 @@ public class BoolQueryTest {
 			String keyword1 = "韩都衣舍";
 			String keyword2 = "马克华菲";
 			String keyword3 = "包邮";
+			String keyword4 = "男士";
+			String keyword5 = "老年";
 
 			List<CommonData> dataList = QueryTestUtils.chineseList();
 
@@ -52,6 +57,8 @@ public class BoolQueryTest {
 			boolQueryBuilder.should(QueryBuilders.matchQuery("desc", keyword1));
 			boolQueryBuilder.should(QueryBuilders.matchQuery("desc", keyword2));
 			boolQueryBuilder.must(QueryBuilders.matchQuery("desc", keyword3));
+			boolQueryBuilder.mustNot(QueryBuilders.matchQuery("desc", keyword4));
+			boolQueryBuilder.filter(QueryBuilders.matchQuery("desc", keyword5));
 
 			// 查询数据
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();

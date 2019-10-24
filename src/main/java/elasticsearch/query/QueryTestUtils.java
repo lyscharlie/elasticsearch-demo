@@ -47,8 +47,10 @@ public class QueryTestUtils {
 		words.add("女装 长绒拉链连帽运动开衫 126418 优衣库");
 		words.add("【懒猫洗衣】运动鞋/休闲鞋清洗保养3双 免费上门取送");
 		words.add("[Midea/美的]美的蒸汽挂烫机正品 家用双杆挂式电熨斗熨");
-		words.add("马克华菲羽绒服男士韩版羽绒外套 精选白鸭绒足量填充");
+		words.add("马克华菲羽绒服男士韩版羽绒外套 精选白鸭绒足量填充包邮");
 		words.add("马克华菲羽绒服女士韩版羽绒外套 精选白鸭绒足量填充包邮");
+		words.add("马克华菲羽绒服女士韩版羽绒外套 精选黑鸭绒足量填充包邮");
+		words.add("马克华菲羽绒服老年韩版羽绒外套 精选黑鸭绒足量填充包邮");
 		words.add("马克华菲羽绒服老年韩版羽绒外套 精选白鸭绒足量填充");
 		words.add("[Omega/欧米茄]蝶飞经典机械男表");
 		words.add("七度空间优雅丝柔12包组合 定制专供 加量不加价");
@@ -58,6 +60,9 @@ public class QueryTestUtils {
 		words.add("翠苑街道文三路477号华星科技大厦");
 
 		List<CommonData> dataList = new ArrayList<>();
+
+		line();
+
 		for (int i = 0; i < words.size(); i++) {
 			CommonData data = new CommonData();
 			data.setName("test " + i);
@@ -65,7 +70,11 @@ public class QueryTestUtils {
 			data.setNumber(i);
 			data.setTime(new Date());
 			dataList.add(data);
+
+			System.out.println(data.toString());
 		}
+
+		line();
 
 		return dataList;
 	}
@@ -85,6 +94,8 @@ public class QueryTestUtils {
 		words.add("Learn to build visualizations quickly, easily, and effectively using Kibana and the Elastic Stack. ");
 		words.add("Join this webinar to learn how you can start creating custom, infographic-style presentations with your live Elasticsearch data.");
 
+		line();
+
 		List<CommonData> dataList = new ArrayList<>();
 		for (int i = 0; i < words.size(); i++) {
 			CommonData data = new CommonData();
@@ -93,7 +104,11 @@ public class QueryTestUtils {
 			data.setNumber(i);
 			data.setTime(new Date());
 			dataList.add(data);
+
+			System.out.println(data.toString());
 		}
+
+		line();
 
 		return dataList;
 	}
