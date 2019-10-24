@@ -1,0 +1,25 @@
+{
+	"properties": {
+		"name": {
+			"type": "keyword"
+		},
+		"desc": {
+			"type": "text",
+			"index": true,
+			"analyzer": "ik_max_word",
+			"search_analyzer": "ik_smart"
+		},
+		"mark": {
+			"type": "text",
+			"index": true,
+			"analyzer": "ik_max_word",
+			"search_analyzer": "ik_smart"
+		},
+		"number": {
+			"type": "integer"
+		},
+		"time": {
+			"type": "date"
+		}
+	}
+}

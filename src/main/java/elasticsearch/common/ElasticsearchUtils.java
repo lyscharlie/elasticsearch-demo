@@ -3,9 +3,9 @@ package elasticsearch.common;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -39,32 +39,35 @@ public class ElasticsearchUtils {
 	/**
 	 * 初始化客户端
 	 *
+	 * @param scheme
 	 * @param host
 	 * @param port
 	 * @return
 	 */
-	public static RestHighLevelClient initClient(String host, int port) {
-		RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost(host, port, "http")));
-		return client;
+	public static RestHighLevelClient initClient(String scheme, String host, int port) {
+		return new RestHighLevelClient(RestClient.builder(new HttpHost(host, port, scheme)));
 	}
 
 	/**
 	 * 创建索引
 	 *
 	 * @param index（index名必须全小写，否则报错）
+	 * @param mappings
 	 * @return
 	 */
-	public static boolean createIndex(RestHighLevelClient client, String index) {
+	public static boolean createIndex(RestHighLevelClient client, String index, String mappings) {
 		try {
-			CreateIndexRequest request = new CreateIndexRequest(index);
-			CreateIndexResponse indexResponse = client.indices().create(request, RequestOptions.DEFAULT);
-
-			if (indexResponse.isAcknowledged()) {
+			CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
+			if (StringUtils.isNotBlank(mappings)) {
+				createIndexRequest.mapping(mappings, XContentType.JSON);
+			}
+			CreateIndexResponse createIndexResponse = client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+			if (createIndexResponse.isAcknowledged()) {
 				log.info("创建索引成功");
 			} else {
 				log.info("创建索引失败");
 			}
-			return indexResponse.isAcknowledged();
+			return createIndexResponse.isAcknowledged();
 		} catch (IOException e) {
 			log.error("ElasticsearchUtils.createIndex", e);
 		}
@@ -115,7 +118,7 @@ public class ElasticsearchUtils {
 	 * @param sync   是否同步
 	 * @return
 	 */
-	public static String saveDoc(RestHighLevelClient client, String index, String id, Object object, boolean sync) {
+	public static IndexResponse saveDoc(RestHighLevelClient client, String index, String id, Object object, boolean sync) {
 		try {
 			IndexRequest indexRequest = new IndexRequest();
 			indexRequest.index(index);
@@ -126,7 +129,7 @@ public class ElasticsearchUtils {
 				indexRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
 			}
 			IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
-			return indexResponse.getId();
+			return indexResponse;
 		} catch (Exception e) {
 			log.error("ElasticsearchUtils.saveDoc", e);
 		}
@@ -143,7 +146,7 @@ public class ElasticsearchUtils {
 	 * @param sync       是否同步
 	 * @return
 	 */
-	public static <T> String saveBulkDocs(RestHighLevelClient client, String index, List<T> objectList, boolean sync) {
+	public static <T> BulkResponse saveBulkDocs(RestHighLevelClient client, String index, List<T> objectList, boolean sync) {
 		try {
 			BulkRequest bulkRequest = new BulkRequest();
 			for (Object object : objectList) {
@@ -157,12 +160,12 @@ public class ElasticsearchUtils {
 			}
 			BulkResponse response = client.bulk(bulkRequest, RequestOptions.DEFAULT);
 
-			for (BulkItemResponse bulkItemResponse : response.getItems()) {
-				System.out.println(bulkItemResponse.getResponse().getId());
-			}
-			System.out.println(JSONObject.toJSON(response));
+			// for (BulkItemResponse bulkItemResponse : response.getItems()) {
+			// 	System.out.println(bulkItemResponse.getResponse().getId());
+			// }
+			// System.out.println(JSONObject.toJSON(response));
 
-			return response.toString();
+			return response;
 		} catch (Exception e) {
 			log.error("ElasticsearchUtils.saveBulkDocs", e);
 		}
@@ -177,13 +180,13 @@ public class ElasticsearchUtils {
 	 * @param id
 	 * @return
 	 */
-	public static String getDocById(RestHighLevelClient client, String index, String id) {
+	public static GetResponse getDocById(RestHighLevelClient client, String index, String id) {
 		try {
 			GetRequest request = new GetRequest();
 			request.index(index);
 			request.id(id);
 			GetResponse response = client.get(request, RequestOptions.DEFAULT);
-			return response.toString();
+			return response;
 		} catch (Exception e) {
 			log.error("ElasticsearchUtils.getDocById", e);
 		}
@@ -198,12 +201,12 @@ public class ElasticsearchUtils {
 	 * @param sourceBuilder
 	 * @return
 	 */
-	public static String getDocsByQuery(RestHighLevelClient client, String index, SearchSourceBuilder sourceBuilder) {
+	public static SearchResponse getDocsByQuery(RestHighLevelClient client, String index, SearchSourceBuilder sourceBuilder) {
 		try {
 			SearchRequest searchRequest = new SearchRequest(index);
 			searchRequest.source(sourceBuilder);
 			SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
-			return response.toString();
+			return response;
 		} catch (Exception e) {
 			log.error("ElasticsearchUtils.getDocsByQuery", e);
 		}
@@ -218,12 +221,12 @@ public class ElasticsearchUtils {
 	 * @param id
 	 * @return
 	 */
-	public static String removeDocById(RestHighLevelClient client, String index, String id) {
+	public static DeleteResponse removeDocById(RestHighLevelClient client, String index, String id) {
 		try {
 			DeleteRequest deleteRequest = new DeleteRequest(index);
 			deleteRequest.id(id);
 			DeleteResponse response = client.delete(deleteRequest, RequestOptions.DEFAULT);
-			return response.toString();
+			return response;
 		} catch (Exception e) {
 			log.error("ElasticsearchUtils.removeDocById", e);
 		}
@@ -237,13 +240,13 @@ public class ElasticsearchUtils {
 	 * @param index
 	 * @param sourceBuilder
 	 */
-	public static String removeDocsByQuery(RestHighLevelClient client, String index, SearchSourceBuilder sourceBuilder) {
+	public static BulkByScrollResponse removeDocsByQuery(RestHighLevelClient client, String index, SearchSourceBuilder sourceBuilder) {
 		try {
 			DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(index);
 			deleteByQueryRequest.setQuery(sourceBuilder.query());
 			deleteByQueryRequest.setRefresh(true);
 			BulkByScrollResponse bulkByScrollResponse = client.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
-			return bulkByScrollResponse.toString();
+			return bulkByScrollResponse;
 		} catch (IOException e) {
 			log.error("ElasticsearchUtils.removeDocsByQuery", e);
 		}

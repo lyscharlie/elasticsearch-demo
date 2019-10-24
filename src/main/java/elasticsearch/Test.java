@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -22,11 +23,11 @@ public class Test {
 			int port = 9200;
 			String index = "test1";
 
-			RestHighLevelClient client = ElasticsearchUtils.initClient(host, port);
+			RestHighLevelClient client = ElasticsearchUtils.initClient("http", host, port);
 
 			// 创建
 			if (!ElasticsearchUtils.checkIndexExist(client, index)) {
-				boolean success = ElasticsearchUtils.createIndex(client, index);
+				boolean success = ElasticsearchUtils.createIndex(client, index, null);
 				if (success) {
 					System.out.println("创建索引成功");
 				} else {
@@ -42,11 +43,12 @@ public class Test {
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", "test 1");
 			map.put("count", RandomUtils.nextInt(0, 100));
-			String id = ElasticsearchUtils.saveDoc(client, index, "1", map, true);
+			IndexResponse indexResponse = ElasticsearchUtils.saveDoc(client, index, "1", map, true);
+			String id = indexResponse.getId();
 			System.out.println(id);
 
 			// 单个查询
-			String result1 = ElasticsearchUtils.getDocById(client, index, "1");
+			String result1 = ElasticsearchUtils.getDocById(client, index, "1").toString();
 			System.out.println(result1);
 
 			// 批量新增数据
@@ -58,7 +60,7 @@ public class Test {
 				dataMap.put("count", RandomUtils.nextInt(0, 100));
 				mapList.add(dataMap);
 			}
-			String result3 = ElasticsearchUtils.saveBulkDocs(client, index, mapList, true);
+			String result3 = ElasticsearchUtils.saveBulkDocs(client, index, mapList, true).toString();
 			System.out.println(result3);
 
 			// 查询
@@ -67,7 +69,7 @@ public class Test {
 			sourceBuilder.size(10);
 			MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", "test");
 			sourceBuilder.query(matchQueryBuilder);
-			String result2 = ElasticsearchUtils.getDocsByQuery(client, index, sourceBuilder);
+			String result2 = ElasticsearchUtils.getDocsByQuery(client, index, sourceBuilder).toString();
 			System.out.println(sourceBuilder);
 			System.out.println(result2);
 
