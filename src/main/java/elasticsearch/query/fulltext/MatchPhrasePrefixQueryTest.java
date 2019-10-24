@@ -1,31 +1,20 @@
 package elasticsearch.query.fulltext;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.MatchPhrasePrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 
-import com.alibaba.fastjson.JSONObject;
-
 import dataobject.CommonData;
-import elasticsearch.common.ElasticsearchClientFactory;
+import elasticsearch.common.ElasticsearchUtils;
+import elasticsearch.query.QueryTestUtils;
 
 /**
  * 短语搜索（不适用中文）
@@ -35,57 +24,32 @@ import elasticsearch.common.ElasticsearchClientFactory;
 public class MatchPhrasePrefixQueryTest {
 
 	public static void main(String[] args) {
-		String keyword = "Kibana Elasticsearch";
-
-		List<String> words = new ArrayList<String>();
-		words.add("Expert Tips When Migrating to Elastic Cloud Enterprise (ECE)");
-		words.add("Building Effective Dashboards with Kibana and Elasticsearch");
-		words.add("Intro to Canvas: A new way to tell visual stories in Kibana");
-		words.add("Learn how to easily navigate a migration, and avoid common mistakes by adopting these simple, insightful tips.");
-		words.add("Feel free to forward this invite to any colleagues");
-		words.add("Learn to build visualizations quickly, easily, and effectively using Kibana and the Elastic Stack. ");
-		words.add("Join this webinar to learn how you can start creating custom, infographic-style presentations with your live Elasticsearch data.");
-
-		List<CommonData> dataList = new ArrayList<>();
-		for (int i = 0; i < words.size(); i++) {
-			CommonData data = new CommonData();
-			data.setName("test " + i);
-			data.setDesc(words.get(i));
-			data.setNumber(i);
-			data.setTime(new Date());
-			dataList.add(data);
-		}
 
 		try {
-			String scheme = "http";
-			String host = "localhost";
-			int port = 9200;
+			String keyword = "Kibana Elasticsearch";
+
+			List<CommonData> dataList = QueryTestUtils.englishList();
 
 			String index = "demo_test";
-
-			String mappings = FileUtils.readFileToString(new File(MatchPhrasePrefixQueryTest.class.getResource("/dataobject/common_data_mapping.json").getPath()), "utf-8");
+			String mappings = QueryTestUtils.mappings();
 
 			// 连接elasticsearch
-			RestHighLevelClient client = ElasticsearchClientFactory.initClient(scheme, host, port);
+			RestHighLevelClient client = QueryTestUtils.initClient();
 
 			// 创建index
-			if (!ElasticsearchClientFactory.checkIndexExist(client, index)) {
-				ElasticsearchClientFactory.createIndex(client, index, mappings);
+			if (!ElasticsearchUtils.checkIndexExist(client, index)) {
+				ElasticsearchUtils.createIndex(client, index, mappings);
 			}
 
+			QueryTestUtils.line("完成创建索引");
+
 			// 批量添加数据
-			BulkRequest bulkRequest = new BulkRequest();
-			for (CommonData data : dataList) {
-				IndexRequest indexRequest = new IndexRequest();
-				indexRequest.index(index);
-				indexRequest.source(JSONObject.toJSONString(data), XContentType.JSON);
-				bulkRequest.add(indexRequest);
-			}
-			bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);// 强制同步操作
-			BulkResponse bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+			BulkResponse bulkResponse = ElasticsearchUtils.saveBulkDocs(client, index, dataList, true);
 			for (BulkItemResponse bulkItemResponse : bulkResponse.getItems()) {
 				System.out.println(bulkItemResponse.getResponse().getId());
 			}
+
+			QueryTestUtils.line("完成写入");
 
 			// 查询数据
 			MatchPhrasePrefixQueryBuilder matchPhrasePrefixQueryBuilder = QueryBuilders.matchPhrasePrefixQuery("desc", keyword);
@@ -103,11 +67,13 @@ public class MatchPhrasePrefixQueryTest {
 			searchSourceBuilder.highlighter(highlightBuilder);
 			System.out.println(searchSourceBuilder);
 
-			SearchRequest searchRequest = new SearchRequest(index);
-			searchRequest.source(searchSourceBuilder);
+			QueryTestUtils.line();
 
-			SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+			SearchResponse response = ElasticsearchUtils.getDocsByQuery(client, index, searchSourceBuilder);
 			System.out.println(response.toString());
+
+			QueryTestUtils.line();
+
 			if (response.getHits().getTotalHits().value > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
 					System.out.println(item.getScore() + "==>" + item.getHighlightFields());
@@ -116,7 +82,7 @@ public class MatchPhrasePrefixQueryTest {
 			}
 
 			// 删除index
-			ElasticsearchClientFactory.deleteIndex(client, index);
+			ElasticsearchUtils.removeIndex(client, index);
 
 			// 关闭
 			client.close();

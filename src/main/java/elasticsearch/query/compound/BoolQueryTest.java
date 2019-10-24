@@ -62,6 +62,9 @@ public class BoolQueryTest {
 
 			SearchResponse response = ElasticsearchUtils.getDocsByQuery(client, index, searchSourceBuilder);
 			System.out.println(response.toString());
+
+			QueryTestUtils.line();
+
 			if (response.getHits().getTotalHits().value > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
 					System.out.println(item.getSourceAsString());

@@ -1,12 +1,14 @@
 package elasticsearch.query;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.elasticsearch.client.RestHighLevelClient;
 
-import common.FileUtils;
 import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 
@@ -30,8 +32,8 @@ public class QueryTestUtils {
 	 *
 	 * @return
 	 */
-	public static String mappings() {
-		return FileUtils.readFile(QueryTestUtils.class.getResource("/dataobject/common_data_mapping.json").getPath(), "utf-8");
+	public static String mappings() throws IOException {
+		return FileUtils.readFileToString(new File(QueryTestUtils.class.getResource("/dataobject/common_data_mapping.json").getPath()), "utf-8");
 	}
 
 	/**
