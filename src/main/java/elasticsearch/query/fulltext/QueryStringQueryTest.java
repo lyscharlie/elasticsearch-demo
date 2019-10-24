@@ -21,16 +21,16 @@ import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
 /**
- *
+ * 根据值去每个字段进行模糊查询 +代表必须含有  -代表不能含有
  */
 public class QueryStringQueryTest {
 
 	public static void main(String[] args) {
 		try {
 
-			String keyword = "泸州老窖";
+			String keyword = "+马克华菲 -男士";
 
-			List<String> words1 = new ArrayList<String>();
+			List<String> words1 = new ArrayList<>();
 			words1.add("韩都衣舍韩版连衣裙");
 			words1.add("长绒拉链连帽运动开衫");
 			words1.add("运动鞋/休闲鞋清洗保养");
@@ -45,7 +45,7 @@ public class QueryStringQueryTest {
 			words1.add("泸州老窖");
 			words1.add("华星科技大厦");
 
-			List<String> words2 = new ArrayList<String>();
+			List<String> words2 = new ArrayList<>();
 			words2.add("韩都衣舍韩版2014秋冬新款女装蝙蝠袖连帽长袖连衣裙");
 			words2.add("女装 长绒拉链连帽运动开衫 126418 优衣库");
 			words2.add("【懒猫洗衣】运动鞋/休闲鞋清洗保养3双 免费上门取送");
@@ -122,8 +122,7 @@ public class QueryStringQueryTest {
 
 			if (response.getHits().getTotalHits().value > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
-					System.out.println(item.getScore() + "==>" + item.getHighlightFields());
-					System.out.println(item.getSourceAsString());
+					System.out.println(item.getScore() + "==>" + item.getHighlightFields() + "===>"+ item.getSourceAsString());
 				}
 			}
 
