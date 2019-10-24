@@ -28,6 +28,9 @@ import common.FileUtils;
 import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchClientFactory;
 
+/**
+ *
+ */
 public class QueryStringQueryTest {
 
 	public static void main(String[] args) {
