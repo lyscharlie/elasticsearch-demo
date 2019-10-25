@@ -9,9 +9,9 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.geo.GeoPoint;
 
 import dataobject.CommonData;
+import dataobject.GeoPoint;
 import elasticsearch.common.ElasticsearchUtils;
 
 public class QueryTestUtils {
@@ -35,7 +35,7 @@ public class QueryTestUtils {
 	 * @return
 	 */
 	public static String mappings() throws IOException {
-		return FileUtils.readFileToString(new File(QueryTestUtils.class.getResource("/dataobject/common_data_mapping.json").getPath()), "utf-8");
+		return FileUtils.readFileToString(new File(QueryTestUtils.class.getResource("/mappings/common_data_mapping.json").getPath()), "utf-8");
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class QueryTestUtils {
 			data.setDesc(words.get(i));
 			data.setNumber(i);
 			data.setTime(new Date());
-			data.setLocation(new GeoPoint(RandomUtils.nextDouble(1, 180), RandomUtils.nextDouble(1, 180)));
+			data.setLocation(new GeoPoint(RandomUtils.nextDouble(0, 89), RandomUtils.nextDouble(0, 179)));
 			dataList.add(data);
 
 			System.out.println(data.toString());
@@ -106,6 +106,7 @@ public class QueryTestUtils {
 			data.setDesc(words.get(i));
 			data.setNumber(i);
 			data.setTime(new Date());
+			data.setLocation(new GeoPoint(RandomUtils.nextDouble(0, 89), RandomUtils.nextDouble(0, 179)));
 			dataList.add(data);
 
 			System.out.println(data.toString());

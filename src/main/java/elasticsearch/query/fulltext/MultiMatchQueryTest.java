@@ -77,9 +77,10 @@ public class MultiMatchQueryTest {
 			RestHighLevelClient client = QueryTestUtils.initClient();
 
 			// 创建index
-			if (!ElasticsearchUtils.checkIndexExist(client, index)) {
-				ElasticsearchUtils.createIndex(client, index, mappings);
+			if (ElasticsearchUtils.checkIndexExist(client, index)) {
+				ElasticsearchUtils.removeIndex(client, index);
 			}
+			ElasticsearchUtils.createIndex(client, index, mappings);
 
 			QueryTestUtils.line("完成创建索引");
 
@@ -117,7 +118,7 @@ public class MultiMatchQueryTest {
 
 			if (response.getHits().getTotalHits().value > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
-					System.out.println(item.getScore() + "==>" + item.getHighlightFields() + " ==> "+ item.getSourceAsString());
+					System.out.println(item.getScore() + "==>" + item.getHighlightFields() + " ==> " + item.getSourceAsString());
 				}
 			}
 

@@ -149,6 +149,7 @@ public class ElasticsearchUtils {
 	public static <T> BulkResponse saveBulkDocs(RestHighLevelClient client, String index, List<T> objectList, boolean sync) {
 		try {
 			BulkRequest bulkRequest = new BulkRequest();
+			// bulkRequest.timeout("10000");
 			for (Object object : objectList) {
 				IndexRequest indexRequest = new IndexRequest();
 				indexRequest.index(index);

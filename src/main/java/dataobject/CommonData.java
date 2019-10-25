@@ -2,8 +2,6 @@ package dataobject;
 
 import java.util.Date;
 
-import org.elasticsearch.common.geo.GeoPoint;
-
 import lombok.Data;
 import lombok.ToString;
 

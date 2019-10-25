@@ -78,9 +78,10 @@ public class QueryStringQueryTest {
 			RestHighLevelClient client = QueryTestUtils.initClient();
 
 			// 创建index
-			if (!ElasticsearchUtils.checkIndexExist(client, index)) {
-				ElasticsearchUtils.createIndex(client, index, mappings);
+			if (ElasticsearchUtils.checkIndexExist(client, index)) {
+				ElasticsearchUtils.removeIndex(client, index);
 			}
+			ElasticsearchUtils.createIndex(client, index, mappings);
 
 			QueryTestUtils.line("完成创建索引");
 

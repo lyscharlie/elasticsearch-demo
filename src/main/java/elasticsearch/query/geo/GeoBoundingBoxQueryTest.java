@@ -20,9 +20,8 @@ public class GeoBoundingBoxQueryTest {
 
 	public static void main(String[] args) {
 		try {
-			String keyword = "easily Elasticsearch";
 
-			List<CommonData> dataList = QueryTestUtils.englishList();
+			List<CommonData> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();
@@ -31,9 +30,10 @@ public class GeoBoundingBoxQueryTest {
 			RestHighLevelClient client = QueryTestUtils.initClient();
 
 			// 创建index
-			if (!ElasticsearchUtils.checkIndexExist(client, index)) {
-				ElasticsearchUtils.createIndex(client, index, mappings);
+			if (ElasticsearchUtils.checkIndexExist(client, index)) {
+				ElasticsearchUtils.removeIndex(client, index);
 			}
+			ElasticsearchUtils.createIndex(client, index, mappings);
 
 			QueryTestUtils.line("完成创建索引");
 
@@ -46,7 +46,9 @@ public class GeoBoundingBoxQueryTest {
 			QueryTestUtils.line("完成写入");
 
 			// 查询数据
-			GeoBoundingBoxQueryBuilder geoBoundingBoxQueryBuilder = QueryBuilders.geoBoundingBoxQuery("location").setCorners(new GeoPoint(20d, 100), new GeoPoint(30d, 180));
+			GeoPoint topLeft = new GeoPoint(80, 50);
+			GeoPoint bottomRight = new GeoPoint(10, 150);
+			GeoBoundingBoxQueryBuilder geoBoundingBoxQueryBuilder = QueryBuilders.geoBoundingBoxQuery("location").setCorners(topLeft, bottomRight);
 
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 			searchSourceBuilder.query(geoBoundingBoxQueryBuilder);
