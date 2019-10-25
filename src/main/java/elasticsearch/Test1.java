@@ -138,7 +138,7 @@ public class Test1 {
 						System.out.println(map);
 					}
 					// System.out.println(item.getHighlightFields());
-					// System.out.println(item.getSourceAsString());
+					// System.out.println(item.getScore() + " ==> " + item.getSourceAsString());
 				}
 			}
 

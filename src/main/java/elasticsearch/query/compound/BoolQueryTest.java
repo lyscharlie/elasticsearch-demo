@@ -74,7 +74,7 @@ public class BoolQueryTest {
 
 			if (response.getHits().getTotalHits().value > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
-					System.out.println(item.getSourceAsString());
+					System.out.println(item.getScore() + " ==> " + item.getSourceAsString());
 				}
 			}
 

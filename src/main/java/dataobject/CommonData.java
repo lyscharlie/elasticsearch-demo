@@ -2,6 +2,8 @@ package dataobject;
 
 import java.util.Date;
 
+import org.elasticsearch.common.geo.GeoPoint;
+
 import lombok.Data;
 import lombok.ToString;
 
@@ -18,5 +20,7 @@ public class CommonData {
 	private Integer number;
 
 	private Date time;
+
+	private GeoPoint location;
 
 }

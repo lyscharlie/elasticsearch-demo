@@ -20,6 +20,9 @@
 		},
 		"time": {
 			"type": "date"
+		},
+		"location": {
+			"type": "geo_point"
 		}
 	}
 }

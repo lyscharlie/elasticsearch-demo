@@ -76,7 +76,7 @@ public class MatchPhraseQueryTest {
 
 			if (response.getHits().getTotalHits().value > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
-					System.out.println(item.getScore() + "==>" + item.getHighlightFields() + "===>"+ item.getSourceAsString());
+					System.out.println(item.getScore() + "==>" + item.getHighlightFields() + " ==> "+ item.getSourceAsString());
 				}
 			}
 

@@ -7,7 +7,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.geo.GeoPoint;
 
 import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
@@ -69,6 +71,7 @@ public class QueryTestUtils {
 			data.setDesc(words.get(i));
 			data.setNumber(i);
 			data.setTime(new Date());
+			data.setLocation(new GeoPoint(RandomUtils.nextDouble(1, 180), RandomUtils.nextDouble(1, 180)));
 			dataList.add(data);
 
 			System.out.println(data.toString());
