@@ -16,6 +16,9 @@ import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
+/**
+ * 查询给定距离范围内的点
+ */
 public class GeoDistanceQueryTest {
 
 	public static void main(String[] args) {
@@ -46,7 +49,7 @@ public class GeoDistanceQueryTest {
 			QueryTestUtils.line("完成写入");
 
 			// 查询数据
-			GeoDistanceQueryBuilder geoDistanceQueryBuilder = QueryBuilders.geoDistanceQuery("location").point(50d, 100d).distance(1000d, DistanceUnit.KILOMETERS);
+			GeoDistanceQueryBuilder geoDistanceQueryBuilder = QueryBuilders.geoDistanceQuery("location").point(50d, 100d).distance(5000d, DistanceUnit.KILOMETERS);
 
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 			searchSourceBuilder.query(geoDistanceQueryBuilder);

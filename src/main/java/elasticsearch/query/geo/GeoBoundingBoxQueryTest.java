@@ -16,6 +16,9 @@ import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
+/**
+ * 根据给定两个点组成的矩形，查询矩形内的点
+ */
 public class GeoBoundingBoxQueryTest {
 
 	public static void main(String[] args) {
