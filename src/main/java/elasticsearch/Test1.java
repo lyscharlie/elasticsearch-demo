@@ -8,10 +8,7 @@ import java.util.Map;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.HttpHost;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -23,6 +20,9 @@ import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.MatchQueryBuilder;
@@ -54,8 +54,7 @@ public class Test1 {
 			RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost(host, port, scheme)));
 
 			// 创建index
-			GetIndexRequest request = new GetIndexRequest();
-			request.indices(index);
+			GetIndexRequest request = new GetIndexRequest(index);
 			if (client.indices().exists(request, RequestOptions.DEFAULT)) {
 				System.out.println("索引" + index + "已创建");
 			} else {

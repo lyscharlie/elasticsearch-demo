@@ -12,7 +12,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 
-import dataobject.CommonData;
+import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -28,7 +28,7 @@ public class MatchPhrasePrefixQueryTest {
 		try {
 			String keyword = "Kibana Elasticsearch";
 
-			List<CommonData> dataList = QueryTestUtils.englishList();
+			List<BaseDocument> dataList = QueryTestUtils.englishList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();

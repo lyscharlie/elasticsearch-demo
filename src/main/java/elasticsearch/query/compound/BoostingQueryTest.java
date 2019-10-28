@@ -11,7 +11,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import dataobject.CommonData;
+import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -26,7 +26,7 @@ public class BoostingQueryTest {
 			String keyword1 = "包邮";
 			String keyword2 = "马克华菲";
 
-			List<CommonData> dataList = QueryTestUtils.chineseList();
+			List<BaseDocument> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();

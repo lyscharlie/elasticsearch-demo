@@ -12,6 +12,7 @@ import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
+import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 
 public class Test {
@@ -43,7 +44,7 @@ public class Test {
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", "test 1");
 			map.put("count", RandomUtils.nextInt(0, 100));
-			IndexResponse indexResponse = ElasticsearchUtils.saveDoc(client, index, "1", map, true);
+			IndexResponse indexResponse = ElasticsearchUtils.saveDoc(client, index, new BaseDocument("1", map), true);
 			String id = indexResponse.getId();
 			System.out.println(id);
 
@@ -52,15 +53,15 @@ public class Test {
 			System.out.println(result1);
 
 			// 批量新增数据
-			List<Map<String, Object>> mapList = new ArrayList<>();
+			List<BaseDocument> dataList = new ArrayList<>();
 			for (int i = 1; i <= 10; i++) {
 				Map<String, Object> dataMap = new HashMap<>();
 				map.put("id", i + "");
 				dataMap.put("name", "test " + i);
 				dataMap.put("count", RandomUtils.nextInt(0, 100));
-				mapList.add(dataMap);
+				dataList.add(new BaseDocument(null, map));
 			}
-			String result3 = ElasticsearchUtils.saveBulkDocs(client, index, mapList, true).toString();
+			String result3 = ElasticsearchUtils.saveBulkDocs(client, index, dataList, true).toString();
 			System.out.println(result3);
 
 			// 查询

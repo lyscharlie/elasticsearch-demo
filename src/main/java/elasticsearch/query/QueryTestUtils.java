@@ -12,6 +12,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 
 import dataobject.CommonData;
 import dataobject.GeoPoint;
+import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 
 public class QueryTestUtils {
@@ -43,7 +44,7 @@ public class QueryTestUtils {
 	 *
 	 * @return
 	 */
-	public static List<CommonData> chineseList() {
+	public static List<BaseDocument> chineseList() {
 		List<String> words = new ArrayList<>();
 		words.add("韩都衣舍韩版2014秋冬新款女装蝙蝠袖连帽长袖连衣裙包邮");
 		words.add("女装 长绒拉链连帽运动开衫 126418 优衣库");
@@ -61,18 +62,19 @@ public class QueryTestUtils {
 		words.add("泸州老窖 60°泸州老窖泸州原浆珍品1500ml 三斤大坛酒");
 		words.add("翠苑街道文三路477号华星科技大厦");
 
-		List<CommonData> dataList = new ArrayList<>();
+		List<BaseDocument> dataList = new ArrayList<>();
 
 		line();
 
 		for (int i = 0; i < words.size(); i++) {
 			CommonData data = new CommonData();
+			data.setCode("code_" + i);
 			data.setName("test " + i);
 			data.setDesc(words.get(i));
 			data.setNumber(i);
 			data.setTime(new Date());
 			data.setLocation(new GeoPoint(RandomUtils.nextDouble(0, 89), RandomUtils.nextDouble(0, 179)));
-			dataList.add(data);
+			dataList.add(new BaseDocument(data.getCode(), data));
 
 			System.out.println(data.toString());
 		}
@@ -87,7 +89,7 @@ public class QueryTestUtils {
 	 *
 	 * @return
 	 */
-	public static List<CommonData> englishList() {
+	public static List<BaseDocument> englishList() {
 		List<String> words = new ArrayList<>();
 		words.add("Expert Tips When Migrating to Elastic Cloud Enterprise (ECE)");
 		words.add("Building Effective Dashboards with Kibana and Elasticsearch");
@@ -99,15 +101,16 @@ public class QueryTestUtils {
 
 		line();
 
-		List<CommonData> dataList = new ArrayList<>();
+		List<BaseDocument> dataList = new ArrayList<>();
 		for (int i = 0; i < words.size(); i++) {
 			CommonData data = new CommonData();
+			data.setCode("code_" + i);
 			data.setName("test " + i);
 			data.setDesc(words.get(i));
 			data.setNumber(i);
 			data.setTime(new Date());
 			data.setLocation(new GeoPoint(RandomUtils.nextDouble(0, 89), RandomUtils.nextDouble(0, 179)));
-			dataList.add(data);
+			dataList.add(new BaseDocument(data.getCode(), data));
 
 			System.out.println(data.toString());
 		}

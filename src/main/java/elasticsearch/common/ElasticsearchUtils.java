@@ -113,17 +113,18 @@ public class ElasticsearchUtils {
 	/**
 	 * 写入数据
 	 *
+	 * @param client
 	 * @param index
-	 * @param object
-	 * @param sync   是否同步
+	 * @param document
+	 * @param sync     是否同步
 	 * @return
 	 */
-	public static IndexResponse saveDoc(RestHighLevelClient client, String index, String id, Object object, boolean sync) {
+	public static IndexResponse saveDoc(RestHighLevelClient client, String index, BaseDocument document, boolean sync) {
 		try {
 			IndexRequest indexRequest = new IndexRequest();
 			indexRequest.index(index);
-			indexRequest.id(id);
-			indexRequest.source(JSONObject.toJSONString(object), XContentType.JSON);
+			indexRequest.id(document.getId());
+			indexRequest.source(JSONObject.toJSONString(document.getObject()), XContentType.JSON);
 
 			if (sync) {
 				indexRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
@@ -142,29 +143,27 @@ public class ElasticsearchUtils {
 	 * @param <T>
 	 * @param client
 	 * @param index
-	 * @param objectList
-	 * @param sync       是否同步
+	 * @param documentList
+	 * @param sync         是否同步
 	 * @return
 	 */
-	public static <T> BulkResponse saveBulkDocs(RestHighLevelClient client, String index, List<T> objectList, boolean sync) {
+	public static <T> BulkResponse saveBulkDocs(RestHighLevelClient client, String index, List<BaseDocument> documentList, boolean sync) {
 		try {
 			BulkRequest bulkRequest = new BulkRequest();
-			// bulkRequest.timeout("10000");
-			for (Object object : objectList) {
+
+			for (BaseDocument document : documentList) {
 				IndexRequest indexRequest = new IndexRequest();
 				indexRequest.index(index);
-				indexRequest.source(JSONObject.toJSONString(object), XContentType.JSON);
+				if (StringUtils.isNotBlank(document.getId())) {
+					indexRequest.id(document.getId());
+				}
+				indexRequest.source(JSONObject.toJSONString(document.getObject()), XContentType.JSON);
 				bulkRequest.add(indexRequest);
 			}
 			if (sync) {
 				bulkRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
 			}
 			BulkResponse response = client.bulk(bulkRequest, RequestOptions.DEFAULT);
-
-			// for (BulkItemResponse bulkItemResponse : response.getItems()) {
-			// 	System.out.println(bulkItemResponse.getResponse().getId());
-			// }
-			// System.out.println(JSONObject.toJSON(response));
 
 			return response;
 		} catch (Exception e) {

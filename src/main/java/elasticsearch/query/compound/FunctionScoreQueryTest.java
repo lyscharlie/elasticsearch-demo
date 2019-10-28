@@ -12,7 +12,7 @@ import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import dataobject.CommonData;
+import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -26,7 +26,7 @@ public class FunctionScoreQueryTest {
 
 			String keyword = "包邮";
 
-			List<CommonData> dataList = QueryTestUtils.chineseList();
+			List<BaseDocument> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();

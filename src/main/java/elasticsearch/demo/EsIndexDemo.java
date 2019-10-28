@@ -34,7 +34,8 @@ public class EsIndexDemo {
 	 */
 	public static IndexResponse postRequest(String index, String type, String id, String jsonSource) throws Exception {
 		// 构建请求
-		IndexRequest request = new IndexRequest(index, type, id);
+		IndexRequest request = new IndexRequest(index);
+		request.id(id);
 		// 将保存数据以JSON格式关联到请求
 		request.source(jsonSource, XContentType.JSON);
 		// Java客户端发起保存数据请求
@@ -45,15 +46,10 @@ public class EsIndexDemo {
 	}
 
 	/**
-	 * @param keyword1
-	 *            关键字1
-	 * @param keyword2
-	 *            关键字2
-	 * @param startDate
-	 *            起始时间
-	 * @param endDate
-	 *            终止时间
-	 *
+	 * @param keyword1  关键字1
+	 * @param keyword2  关键字2
+	 * @param startDate 起始时间
+	 * @param endDate   终止时间
 	 **/
 	public static SearchResponse pageQueryRequest(String keyword1, String keyword2, String startDate, String endDate, int start, int size) {
 		RestHighLevelClient client = RestClientFactory.getHighLevelClient();

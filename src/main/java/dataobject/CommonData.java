@@ -9,6 +9,8 @@ import lombok.ToString;
 @ToString
 public class CommonData {
 
+	private String code;
+
 	private String name;
 
 	private String desc;

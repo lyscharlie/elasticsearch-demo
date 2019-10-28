@@ -13,7 +13,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 
-import dataobject.CommonData;
+import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -29,7 +29,7 @@ public class MatchQueryTest {
 		try {
 			String keyword = "羽绒服";
 
-			List<CommonData> dataList = QueryTestUtils.chineseList();
+			List<BaseDocument> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();

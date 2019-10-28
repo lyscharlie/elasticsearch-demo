@@ -12,7 +12,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import dataobject.CommonData;
+import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -24,7 +24,7 @@ public class GeoDistanceQueryTest {
 	public static void main(String[] args) {
 		try {
 
-			List<CommonData> dataList = QueryTestUtils.chineseList();
+			List<BaseDocument> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();
