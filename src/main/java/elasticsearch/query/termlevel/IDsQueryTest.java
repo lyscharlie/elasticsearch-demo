@@ -22,9 +22,6 @@ public class IDsQueryTest {
 
 	public static void main(String[] args) {
 		try {
-
-			String keyword = "perward";
-
 			List<BaseDocument> dataList = QueryTestUtils.englishList();
 
 			String index = "demo_test";
@@ -49,7 +46,7 @@ public class IDsQueryTest {
 
 			QueryTestUtils.line("完成写入");
 
-			IdsQueryBuilder idsQueryBuilder = QueryBuilders.idsQuery().addIds("test_1", "test_2");
+			IdsQueryBuilder idsQueryBuilder = QueryBuilders.idsQuery().addIds("code_1", "code_2");
 
 			// 查询数据
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();

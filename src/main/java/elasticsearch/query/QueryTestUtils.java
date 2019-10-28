@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.elasticsearch.client.RestHighLevelClient;
 
 import dataobject.CommonData;
@@ -72,7 +73,7 @@ public class QueryTestUtils {
 			data.setName("test " + i);
 			data.setDesc(words.get(i));
 			data.setNumber(i);
-			data.setTime(new Date());
+			data.setTime(DateUtils.addSeconds(new Date(), -1 * RandomUtils.nextInt(1, 10 * 24 * 60 * 60)));
 			data.setLocation(new GeoPoint(RandomUtils.nextDouble(0, 89), RandomUtils.nextDouble(0, 179)));
 			dataList.add(new BaseDocument(data.getCode(), data));
 
@@ -108,7 +109,7 @@ public class QueryTestUtils {
 			data.setName("test " + i);
 			data.setDesc(words.get(i));
 			data.setNumber(i);
-			data.setTime(new Date());
+			data.setTime(DateUtils.addSeconds(new Date(), -1 * RandomUtils.nextInt(1, 10 * 24 * 60 * 60)));
 			data.setLocation(new GeoPoint(RandomUtils.nextDouble(0, 89), RandomUtils.nextDouble(0, 179)));
 			dataList.add(new BaseDocument(data.getCode(), data));
 
