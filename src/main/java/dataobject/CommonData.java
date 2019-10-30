@@ -19,6 +19,8 @@ public class CommonData {
 
 	private Integer number;
 
+	private Integer cat;
+
 	private Date time;
 
 	private GeoPoint location;
