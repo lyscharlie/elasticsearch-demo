@@ -1,6 +1,7 @@
 package dataobject;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 import lombok.ToString;
@@ -13,6 +14,8 @@ public class CommonData {
 
 	private String name;
 
+	private String title;
+
 	private String desc;
 
 	private String mark;
@@ -24,5 +27,7 @@ public class CommonData {
 	private Date time;
 
 	private GeoPoint location;
+
+	private List<String> list;
 
 }

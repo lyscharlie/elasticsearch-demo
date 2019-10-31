@@ -3,6 +3,7 @@ package elasticsearch.query;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -71,11 +72,19 @@ public class QueryTestUtils {
 			CommonData data = new CommonData();
 			data.setCode("code_" + i);
 			data.setName("test " + i);
+			data.setTitle(words.get(i));
 			data.setDesc(words.get(i));
 			data.setNumber(i);
-			data.setCat(i%2);
+			data.setCat(i % 2);
 			data.setTime(DateUtils.addSeconds(new Date(), -1 * RandomUtils.nextInt(1, 10 * 24 * 60 * 60)));
 			data.setLocation(new GeoPoint(RandomUtils.nextDouble(0, 89), RandomUtils.nextDouble(0, 179)));
+			if (i % 3 == 0) {
+				data.setList(Arrays.asList("包邮"));
+			} else if (i % 3 == 1) {
+				data.setList(Arrays.asList("包邮", "定制专供"));
+			} else {
+				data.setList(Arrays.asList("定制专供", "加量不加价"));
+			}
 			dataList.add(new BaseDocument(data.getCode(), data));
 
 			System.out.println(data.toString());

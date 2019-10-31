@@ -1,4 +1,4 @@
-package elasticsearch.query.termlevel;
+package elasticsearch;
 
 import java.util.List;
 
@@ -6,8 +6,8 @@ import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RegexpQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
@@ -15,18 +15,13 @@ import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
-/**
- * 正则
- */
-public class RegexpQueryTest {
+public class SearchArrayTest {
 
 	public static void main(String[] args) {
 		try {
+			String keyword1 = "包邮";
+			String keyword2 = "定制专供";
 
-			// String keyword = "qu.*ly";
-			// List<BaseDocument> dataList = QueryTestUtils.englishList();
-
-			String keyword = ".*黑鸭绒.*";
 			List<BaseDocument> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
@@ -51,11 +46,14 @@ public class RegexpQueryTest {
 
 			QueryTestUtils.line("完成写入");
 
-			RegexpQueryBuilder regexpQueryBuilder = QueryBuilders.regexpQuery("title", keyword);
+			// 关键字
+			BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+			boolQueryBuilder.must(QueryBuilders.termQuery("list", keyword1));
+			boolQueryBuilder.should(QueryBuilders.termQuery("list", keyword2));
 
 			// 查询数据
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-			searchSourceBuilder.query(regexpQueryBuilder);
+			searchSourceBuilder.query(boolQueryBuilder);
 			System.out.println(searchSourceBuilder);
 
 			QueryTestUtils.line();
@@ -67,7 +65,7 @@ public class RegexpQueryTest {
 
 			if (response.getHits().getTotalHits().value > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
-					System.out.println(item.getScore() + " ==> " + item.getSourceAsString());
+					System.out.println(item.getScore() + "==>" + item.getHighlightFields() + " ==> " + item.getSourceAsString());
 				}
 			}
 
@@ -80,5 +78,4 @@ public class RegexpQueryTest {
 			e.printStackTrace();
 		}
 	}
-
 }

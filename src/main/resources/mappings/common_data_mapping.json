@@ -6,6 +6,9 @@
     "name": {
       "type": "keyword"
     },
+    "title": {
+      "type": "keyword"
+    },
     "desc": {
       "type": "text",
       "index": true,
@@ -29,6 +32,9 @@
     },
     "location": {
       "type": "geo_point"
+    },
+    "list": {
+      "type": "keyword"
     }
   }
 }
