@@ -1,4 +1,4 @@
-package elasticsearch;
+package elasticsearch.test;
 
 import java.util.ArrayList;
 import java.util.HashMap;

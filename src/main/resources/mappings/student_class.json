@@ -1,0 +1,18 @@
+{
+  "properties": {
+    "class": {
+      "type": "integer"
+    },
+    "user": {
+      "type": "nested",
+      "properties": {
+        "name": {
+          "type": "keyword"
+        },
+        "age": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}
