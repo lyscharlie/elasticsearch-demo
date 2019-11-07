@@ -7,20 +7,25 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.metrics.ParsedSum;
+import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import com.alibaba.fastjson.JSONObject;
 
 import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
-public class NumberTest {
+public class SumTest {
 
 	public static void main(String[] args) {
 		try {
 
-			List<BaseDocument> dataList = QueryTestUtils.englishList();
+			List<BaseDocument> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();
@@ -44,20 +49,26 @@ public class NumberTest {
 
 			QueryTestUtils.line("完成写入");
 
-			// RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("number").gte(1).lt(5);
-			// RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("number").from(1, true).to(5, false);
-			// TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery("number", Arrays.asList(1, 2, 3, 4, 5));
-			TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery("number", "5");
+			TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("cat", "1");
+			SumAggregationBuilder sumAggregationBuilder = AggregationBuilders.sum("number_sum").field("number");
 
 			// 查询数据
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-			searchSourceBuilder.query(termsQueryBuilder);
+			searchSourceBuilder.size(50);
+			searchSourceBuilder.query(termQueryBuilder);
+			searchSourceBuilder.aggregation(sumAggregationBuilder);
 			System.out.println(searchSourceBuilder);
 
 			QueryTestUtils.line();
 
 			SearchResponse response = ElasticsearchUtils.getDocsByQuery(client, index, searchSourceBuilder);
 			System.out.println(response.toString());
+
+			QueryTestUtils.line();
+
+			System.out.println(JSONObject.toJSONString(response.getAggregations()));
+			ParsedSum parsedSum = (ParsedSum) response.getAggregations().asMap().get("number_sum");
+			System.out.println(JSONObject.toJSONString(parsedSum));
 
 			QueryTestUtils.line();
 
@@ -76,4 +87,5 @@ public class NumberTest {
 			e.printStackTrace();
 		}
 	}
+
 }

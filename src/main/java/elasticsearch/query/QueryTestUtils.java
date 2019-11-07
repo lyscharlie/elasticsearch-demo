@@ -75,7 +75,7 @@ public class QueryTestUtils {
 			data.setTitle(words.get(i));
 			data.setDesc(words.get(i));
 			data.setNumber(i);
-			data.setCat(i % 2);
+			data.setCat(i % 3);
 			data.setTime(DateUtils.addSeconds(new Date(), -1 * RandomUtils.nextInt(1, 10 * 24 * 60 * 60)));
 			data.setLocation(new GeoPoint(RandomUtils.nextDouble(0, 89), RandomUtils.nextDouble(0, 179)));
 			if (i % 3 == 0) {

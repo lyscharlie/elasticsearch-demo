@@ -7,20 +7,27 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.ParsedSum;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import com.alibaba.fastjson.JSONObject;
 
 import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
-public class NumberTest {
+public class SumGroupByTest {
 
 	public static void main(String[] args) {
 		try {
 
-			List<BaseDocument> dataList = QueryTestUtils.englishList();
+			List<BaseDocument> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();
@@ -44,20 +51,34 @@ public class NumberTest {
 
 			QueryTestUtils.line("完成写入");
 
-			// RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("number").gte(1).lt(5);
-			// RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("number").from(1, true).to(5, false);
-			// TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery("number", Arrays.asList(1, 2, 3, 4, 5));
-			TermsQueryBuilder termsQueryBuilder = QueryBuilders.termsQuery("number", "5");
+			RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("number").gte(5);
+			TermsAggregationBuilder termsAggregationBuilder = AggregationBuilders.terms("group_by_cat").field("cat").subAggregation(AggregationBuilders.sum("sum_number").field(
+					"number"));
 
 			// 查询数据
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-			searchSourceBuilder.query(termsQueryBuilder);
+			searchSourceBuilder.size(0);
+			searchSourceBuilder.query(rangeQueryBuilder);
+			searchSourceBuilder.aggregation(termsAggregationBuilder);
 			System.out.println(searchSourceBuilder);
 
 			QueryTestUtils.line();
 
 			SearchResponse response = ElasticsearchUtils.getDocsByQuery(client, index, searchSourceBuilder);
 			System.out.println(response.toString());
+
+			QueryTestUtils.line();
+
+			System.out.println(JSONObject.toJSONString(response.getAggregations().getAsMap().get("group_by_cat")));
+
+			ParsedTerms groupByCat = (ParsedTerms) response.getAggregations().asMap().get("group_by_cat");
+
+			QueryTestUtils.line();
+
+			for (Terms.Bucket bucket : groupByCat.getBuckets()) {
+				ParsedSum sum = (ParsedSum) bucket.getAggregations().asMap().get("sum_number");
+				System.out.println(bucket.getKeyAsString() + "===>" + sum.getValueAsString());
+			}
 
 			QueryTestUtils.line();
 
@@ -76,4 +97,5 @@ public class NumberTest {
 			e.printStackTrace();
 		}
 	}
+
 }
