@@ -1,4 +1,4 @@
-package elasticsearch.query.fulltext;
+package elasticsearch.test;
 
 import java.util.List;
 
@@ -6,29 +6,24 @@ import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 
 import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
 /**
- * 分词匹配
+ * Filter
  *
  * @author liyishi
  */
-public class MatchQueryTest {
+public class FilterTest {
 
 	public static void main(String[] args) {
 
 		try {
-			String keyword = "羽绒服";
-
 			List<BaseDocument> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
@@ -53,22 +48,11 @@ public class MatchQueryTest {
 
 			QueryTestUtils.line("完成写入");
 
-			// 关键字
-			MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("desc", keyword);
-			matchQueryBuilder.operator(Operator.AND);
-
-			// 高亮
-			HighlightBuilder highlightBuilder = new HighlightBuilder();
-			highlightBuilder.preTags("<strong>");// 设置前缀
-			highlightBuilder.postTags("</strong>");// 设置后缀
-			highlightBuilder.field("desc");// 设置高亮字段
-
 			// 查询数据
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 			searchSourceBuilder.from(0);
 			searchSourceBuilder.size(10);
-			searchSourceBuilder.query(matchQueryBuilder);
-			searchSourceBuilder.highlighter(highlightBuilder);
+			searchSourceBuilder.postFilter(QueryBuilders.termQuery("cat", "2"));
 			System.out.println(searchSourceBuilder);
 
 			QueryTestUtils.line();
@@ -80,7 +64,7 @@ public class MatchQueryTest {
 
 			if (response.getHits().getTotalHits().value > 0) {
 				for (SearchHit item : response.getHits().getHits()) {
-					System.out.println(item.getScore() + "==>" + item.getHighlightFields() + " ==> "+ item.getSourceAsString());
+					System.out.println(item.getScore() + "==>" + item.getHighlightFields() + " ==> " + item.getSourceAsString());
 				}
 			}
 
