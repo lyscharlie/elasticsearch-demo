@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -21,10 +22,16 @@ import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.PutMappingRequest;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -76,6 +83,46 @@ public class ElasticsearchUtils {
 	}
 
 	/**
+	 * 设置索引对象 mapping
+	 *
+	 * @param client
+	 * @param index
+	 * @param mappings
+	 * @return
+	 */
+	public static boolean putIndexMapping(RestHighLevelClient client, String index, String mappings) {
+		try {
+			PutMappingRequest putMappingRequest = new PutMappingRequest(index);
+			putMappingRequest.source(mappings, XContentType.JSON);
+			AcknowledgedResponse acknowledgedResponse = client.indices().putMapping(putMappingRequest, RequestOptions.DEFAULT);
+			return acknowledgedResponse.isAcknowledged();
+		} catch (IOException e) {
+			log.error("ElasticsearchUtils.putIndexMapping", e);
+		}
+		return false;
+	}
+
+	/**
+	 * 修改配置
+	 *
+	 * @param client
+	 * @param index
+	 * @param settings
+	 * @return
+	 */
+	public static boolean updateIndexSettings(RestHighLevelClient client, String index, Settings settings) {
+		try {
+			UpdateSettingsRequest updateSettingsRequest = new UpdateSettingsRequest(index);
+			updateSettingsRequest.settings(settings);
+			AcknowledgedResponse acknowledgedResponse = client.indices().putSettings(updateSettingsRequest, RequestOptions.DEFAULT);
+			return acknowledgedResponse.isAcknowledged();
+		} catch (IOException e) {
+			log.error("ElasticsearchUtils.updateIndexSettings", e);
+		}
+		return false;
+	}
+
+	/**
 	 * 检查索引
 	 *
 	 * @param index
@@ -119,7 +166,7 @@ public class ElasticsearchUtils {
 	 * @param sync     是否同步
 	 * @return
 	 */
-	public static IndexResponse saveDoc(RestHighLevelClient client, String index, BaseDocument document, boolean sync) {
+	public static IndexResponse saveDocument(RestHighLevelClient client, String index, BaseDocument document, boolean sync) {
 		try {
 			IndexRequest indexRequest = new IndexRequest();
 			indexRequest.index(index);
@@ -132,7 +179,7 @@ public class ElasticsearchUtils {
 			IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
 			return indexResponse;
 		} catch (Exception e) {
-			log.error("ElasticsearchUtils.saveDoc", e);
+			log.error("ElasticsearchUtils.saveDocument", e);
 		}
 		return null;
 	}
@@ -147,7 +194,7 @@ public class ElasticsearchUtils {
 	 * @param sync         是否同步
 	 * @return
 	 */
-	public static <T> BulkResponse saveBulkDocs(RestHighLevelClient client, String index, List<BaseDocument> documentList, boolean sync) {
+	public static <T> BulkResponse saveBulkDocuments(RestHighLevelClient client, String index, List<BaseDocument> documentList, boolean sync) {
 		try {
 			BulkRequest bulkRequest = new BulkRequest();
 
@@ -167,7 +214,7 @@ public class ElasticsearchUtils {
 
 			return response;
 		} catch (Exception e) {
-			log.error("ElasticsearchUtils.saveBulkDocs", e);
+			log.error("ElasticsearchUtils.saveBulkDocuments", e);
 		}
 		return null;
 	}
@@ -180,7 +227,7 @@ public class ElasticsearchUtils {
 	 * @param id
 	 * @return
 	 */
-	public static GetResponse getDocById(RestHighLevelClient client, String index, String id) {
+	public static GetResponse searchDocumentById(RestHighLevelClient client, String index, String id) {
 		try {
 			GetRequest request = new GetRequest();
 			request.index(index);
@@ -188,7 +235,7 @@ public class ElasticsearchUtils {
 			GetResponse response = client.get(request, RequestOptions.DEFAULT);
 			return response;
 		} catch (Exception e) {
-			log.error("ElasticsearchUtils.getDocById", e);
+			log.error("ElasticsearchUtils.searchDocumentById", e);
 		}
 		return null;
 	}
@@ -201,15 +248,40 @@ public class ElasticsearchUtils {
 	 * @param sourceBuilder
 	 * @return
 	 */
-	public static SearchResponse getDocsByQuery(RestHighLevelClient client, String index, SearchSourceBuilder sourceBuilder) {
+	public static SearchResponse searchDocumentsByQuery(RestHighLevelClient client, String index, SearchSourceBuilder sourceBuilder) {
 		try {
 			SearchRequest searchRequest = new SearchRequest(index);
 			searchRequest.source(sourceBuilder);
 			SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
 			return response;
 		} catch (Exception e) {
-			log.error("ElasticsearchUtils.getDocsByQuery", e);
+			log.error("ElasticsearchUtils.searchDocumentsByQuery", e);
 		}
+		return null;
+	}
+
+	/**
+	 * 查询数量
+	 *
+	 * @param client
+	 * @param index
+	 * @param queryBuilder
+	 * @return
+	 */
+	public static CountResponse countDocumentsByQuery(RestHighLevelClient client, String index, QueryBuilder queryBuilder) {
+		try {
+			SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+			sourceBuilder.query(null != queryBuilder ? queryBuilder : QueryBuilders.matchAllQuery());
+
+			CountRequest countRequest = new CountRequest(index);
+			countRequest.source(sourceBuilder);
+
+			CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
+			return countResponse;
+		} catch (Exception e) {
+			log.error("ElasticsearchUtils.countDocumentsByQuery", e);
+		}
+
 		return null;
 	}
 
@@ -221,14 +293,14 @@ public class ElasticsearchUtils {
 	 * @param id
 	 * @return
 	 */
-	public static DeleteResponse removeDocById(RestHighLevelClient client, String index, String id) {
+	public static DeleteResponse removeDocumentById(RestHighLevelClient client, String index, String id) {
 		try {
 			DeleteRequest deleteRequest = new DeleteRequest(index);
 			deleteRequest.id(id);
 			DeleteResponse response = client.delete(deleteRequest, RequestOptions.DEFAULT);
 			return response;
 		} catch (Exception e) {
-			log.error("ElasticsearchUtils.removeDocById", e);
+			log.error("ElasticsearchUtils.removeDocumentById", e);
 		}
 		return null;
 	}
@@ -240,7 +312,7 @@ public class ElasticsearchUtils {
 	 * @param index
 	 * @param sourceBuilder
 	 */
-	public static BulkByScrollResponse removeDocsByQuery(RestHighLevelClient client, String index, SearchSourceBuilder sourceBuilder) {
+	public static BulkByScrollResponse removeDocumentsByQuery(RestHighLevelClient client, String index, SearchSourceBuilder sourceBuilder) {
 		try {
 			DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(index);
 			deleteByQueryRequest.setQuery(sourceBuilder.query());
@@ -248,7 +320,7 @@ public class ElasticsearchUtils {
 			BulkByScrollResponse bulkByScrollResponse = client.deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
 			return bulkByScrollResponse;
 		} catch (IOException e) {
-			log.error("ElasticsearchUtils.removeDocsByQuery", e);
+			log.error("ElasticsearchUtils.removeDocumentsByQuery", e);
 		}
 		return null;
 	}

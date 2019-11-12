@@ -44,12 +44,12 @@ public class Test {
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", "test 1");
 			map.put("count", RandomUtils.nextInt(0, 100));
-			IndexResponse indexResponse = ElasticsearchUtils.saveDoc(client, index, new BaseDocument("1", map), true);
+			IndexResponse indexResponse = ElasticsearchUtils.saveDocument(client, index, new BaseDocument("1", map), true);
 			String id = indexResponse.getId();
 			System.out.println(id);
 
 			// 单个查询
-			String result1 = ElasticsearchUtils.getDocById(client, index, "1").toString();
+			String result1 = ElasticsearchUtils.searchDocumentById(client, index, "1").toString();
 			System.out.println(result1);
 
 			// 批量新增数据
@@ -61,7 +61,7 @@ public class Test {
 				dataMap.put("count", RandomUtils.nextInt(0, 100));
 				dataList.add(new BaseDocument(null, map));
 			}
-			String result3 = ElasticsearchUtils.saveBulkDocs(client, index, dataList, true).toString();
+			String result3 = ElasticsearchUtils.saveBulkDocuments(client, index, dataList, true).toString();
 			System.out.println(result3);
 
 			// 查询
@@ -70,7 +70,7 @@ public class Test {
 			sourceBuilder.size(10);
 			MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", "test");
 			sourceBuilder.query(matchQueryBuilder);
-			String result2 = ElasticsearchUtils.getDocsByQuery(client, index, sourceBuilder).toString();
+			String result2 = ElasticsearchUtils.searchDocumentsByQuery(client, index, sourceBuilder).toString();
 			System.out.println(sourceBuilder);
 			System.out.println(result2);
 

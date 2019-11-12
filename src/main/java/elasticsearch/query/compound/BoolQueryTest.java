@@ -47,7 +47,7 @@ public class BoolQueryTest {
 			QueryTestUtils.line("完成创建索引");
 
 			// 批量添加数据
-			BulkResponse bulkResponse = ElasticsearchUtils.saveBulkDocs(client, index, dataList, true);
+			BulkResponse bulkResponse = ElasticsearchUtils.saveBulkDocuments(client, index, dataList, true);
 			for (BulkItemResponse bulkItemResponse : bulkResponse.getItems()) {
 				System.out.println(bulkItemResponse.getResponse().getId());
 			}
@@ -68,7 +68,7 @@ public class BoolQueryTest {
 
 			QueryTestUtils.line();
 
-			SearchResponse response = ElasticsearchUtils.getDocsByQuery(client, index, searchSourceBuilder);
+			SearchResponse response = ElasticsearchUtils.searchDocumentsByQuery(client, index, searchSourceBuilder);
 			System.out.println(response.toString());
 
 			QueryTestUtils.line();
