@@ -14,7 +14,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 
 import dataobject.CommonData;
 import dataobject.GeoPoint;
-import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 
 public class QueryTestUtils {
@@ -46,7 +45,7 @@ public class QueryTestUtils {
 	 *
 	 * @return
 	 */
-	public static List<BaseDocument> chineseList() {
+	public static List<CommonData> chineseList() {
 		List<String> words = new ArrayList<>();
 		words.add("韩都衣舍韩版2014秋冬新款女装蝙蝠袖连帽长袖连衣裙包邮");
 		words.add("女装 长绒拉链连帽运动开衫 126418 优衣库");
@@ -64,7 +63,7 @@ public class QueryTestUtils {
 		words.add("泸州老窖 60°泸州老窖泸州原浆珍品1500ml 三斤大坛酒");
 		words.add("翠苑街道文三路477号华星科技大厦");
 
-		List<BaseDocument> dataList = new ArrayList<>();
+		List<CommonData> dataList = new ArrayList<>();
 
 		line();
 
@@ -85,7 +84,9 @@ public class QueryTestUtils {
 			} else {
 				data.setList(Arrays.asList("定制专供", "加量不加价"));
 			}
-			dataList.add(new BaseDocument(data.getCode(), data));
+
+			data.set_id(data.getCode());
+			dataList.add(data);
 
 			System.out.println(data.toString());
 		}
@@ -100,7 +101,7 @@ public class QueryTestUtils {
 	 *
 	 * @return
 	 */
-	public static List<BaseDocument> englishList() {
+	public static List<CommonData> englishList() {
 		List<String> words = new ArrayList<>();
 		words.add("Expert Tips When Migrating to Elastic Cloud Enterprise (ECE)");
 		words.add("Building Effective Dashboards with Kibana and Elasticsearch");
@@ -112,7 +113,7 @@ public class QueryTestUtils {
 
 		line();
 
-		List<BaseDocument> dataList = new ArrayList<>();
+		List<CommonData> dataList = new ArrayList<>();
 		for (int i = 0; i < words.size(); i++) {
 			CommonData data = new CommonData();
 			data.setCode("code_" + i);
@@ -121,7 +122,9 @@ public class QueryTestUtils {
 			data.setNumber(i);
 			data.setTime(DateUtils.addSeconds(new Date(), -1 * RandomUtils.nextInt(1, 10 * 24 * 60 * 60)));
 			data.setLocation(new GeoPoint(RandomUtils.nextDouble(0, 89), RandomUtils.nextDouble(0, 179)));
-			dataList.add(new BaseDocument(data.getCode(), data));
+
+			data.set_id(data.getCode());
+			dataList.add(data);
 
 			System.out.println(data.toString());
 		}

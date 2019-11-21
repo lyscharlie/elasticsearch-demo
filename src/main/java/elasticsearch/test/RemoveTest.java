@@ -14,7 +14,7 @@ import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import elasticsearch.common.BaseDocument;
+import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -23,7 +23,7 @@ public class RemoveTest {
 	public static void main(String[] args) {
 
 		try {
-			List<BaseDocument> dataList = QueryTestUtils.chineseList();
+			List<CommonData> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();

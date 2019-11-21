@@ -21,7 +21,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import com.alibaba.fastjson.JSONObject;
 
 import dataobject.CommonData;
-import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -44,12 +43,12 @@ public class SearchScrollTest {
 
 			QueryTestUtils.line("完成创建索引");
 
-			List<BaseDocument> dataList = new ArrayList<>();
+			List<CommonData> dataList = new ArrayList<>();
 			for (int i = 1; i <= 100; i++) {
 				CommonData data = new CommonData();
 				data.setCode("code_" + i);
 				data.setNumber(i);
-				dataList.add(new BaseDocument(null, data));
+				dataList.add(data);
 			}
 
 			// 批量添加数据

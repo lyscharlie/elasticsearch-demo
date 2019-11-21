@@ -11,7 +11,7 @@ import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import elasticsearch.common.BaseDocument;
+import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -22,7 +22,7 @@ public class TermQueryTest {
 
 			String keyword = "test 1";
 
-			List<BaseDocument> dataList = QueryTestUtils.englishList();
+			List<CommonData> dataList = QueryTestUtils.englishList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();

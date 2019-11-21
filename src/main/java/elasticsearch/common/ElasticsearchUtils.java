@@ -166,12 +166,40 @@ public class ElasticsearchUtils {
 	 * @param sync     是否同步
 	 * @return
 	 */
-	public static IndexResponse saveDocument(RestHighLevelClient client, String index, BaseDocument document, boolean sync) {
+	public static <T extends BaseDocument> IndexResponse saveDocument(RestHighLevelClient client, String index, T document, boolean sync) {
 		try {
 			IndexRequest indexRequest = new IndexRequest();
 			indexRequest.index(index);
-			indexRequest.id(document.getId());
-			indexRequest.source(JSONObject.toJSONString(document.getObject()), XContentType.JSON);
+			indexRequest.id(document.get_id());
+			indexRequest.source(JSONObject.toJSONString(document), XContentType.JSON);
+
+			if (sync) {
+				indexRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+			}
+			IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
+			return indexResponse;
+		} catch (Exception e) {
+			log.error("ElasticsearchUtils.saveDocument", e);
+		}
+		return null;
+	}
+
+	/**
+	 * 写入数据
+	 *
+	 * @param client
+	 * @param index
+	 * @param id
+	 * @param document
+	 * @param sync     是否同步
+	 * @return
+	 */
+	public static <T> IndexResponse saveDocumentById(RestHighLevelClient client, String index, String id, T document, boolean sync) {
+		try {
+			IndexRequest indexRequest = new IndexRequest();
+			indexRequest.index(index);
+			indexRequest.id(id);
+			indexRequest.source(JSONObject.toJSONString(document), XContentType.JSON);
 
 			if (sync) {
 				indexRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
@@ -187,24 +215,54 @@ public class ElasticsearchUtils {
 	/**
 	 * 批量写入
 	 *
-	 * @param <T>
 	 * @param client
 	 * @param index
 	 * @param documentList
 	 * @param sync         是否同步
 	 * @return
 	 */
-	public static <T> BulkResponse saveBulkDocuments(RestHighLevelClient client, String index, List<BaseDocument> documentList, boolean sync) {
+	public static <T extends BaseDocument> BulkResponse saveBulkDocuments(RestHighLevelClient client, String index, List<T> documentList, boolean sync) {
 		try {
 			BulkRequest bulkRequest = new BulkRequest();
 
-			for (BaseDocument document : documentList) {
+			for (T document : documentList) {
 				IndexRequest indexRequest = new IndexRequest();
 				indexRequest.index(index);
-				if (StringUtils.isNotBlank(document.getId())) {
-					indexRequest.id(document.getId());
+				if (StringUtils.isNotBlank(document.get_id())) {
+					indexRequest.id(document.get_id());
 				}
-				indexRequest.source(JSONObject.toJSONString(document.getObject()), XContentType.JSON);
+				indexRequest.source(JSONObject.toJSONString(document), XContentType.JSON);
+				bulkRequest.add(indexRequest);
+			}
+			if (sync) {
+				bulkRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+			}
+			BulkResponse response = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+
+			return response;
+		} catch (Exception e) {
+			log.error("ElasticsearchUtils.saveBulkDocuments", e);
+		}
+		return null;
+	}
+
+	/**
+	 * 批量写入
+	 *
+	 * @param client
+	 * @param index
+	 * @param documentList
+	 * @param sync         是否同步
+	 * @return
+	 */
+	public static <T> BulkResponse saveBulkDocumentsForObject(RestHighLevelClient client, String index, List<T> documentList, boolean sync) {
+		try {
+			BulkRequest bulkRequest = new BulkRequest();
+
+			for (T document : documentList) {
+				IndexRequest indexRequest = new IndexRequest();
+				indexRequest.index(index);
+				indexRequest.source(JSONObject.toJSONString(document), XContentType.JSON);
 				bulkRequest.add(indexRequest);
 			}
 			if (sync) {

@@ -24,7 +24,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import com.alibaba.fastjson.JSONObject;
 
-import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -36,7 +35,7 @@ public class SearchObjectArrayTest {
 
 			List<String> nameList = Arrays.asList("张三", "李四", "王五", "赵六", "刘德华", "张学友", "黎明", "郭富城", "李连杰");
 
-			List<BaseDocument> dataList = new ArrayList<>();
+			List<Map<String, Object>> dataList = new ArrayList<>();
 			for (int i = 1; i <= 20; i++) {
 				Map<String, Object> map = new HashMap<>();
 				map.put("class", i);
@@ -50,7 +49,7 @@ public class SearchObjectArrayTest {
 				}
 				map.put("user", userList);
 				System.out.println(JSONObject.toJSONString(map));
-				dataList.add(new BaseDocument(null, map));
+				dataList.add(map);
 			}
 
 			String index = "demo_array_test";
@@ -68,7 +67,7 @@ public class SearchObjectArrayTest {
 			QueryTestUtils.line("完成创建索引");
 
 			// 批量添加数据
-			BulkResponse bulkResponse = ElasticsearchUtils.saveBulkDocuments(client, index, dataList, true);
+			BulkResponse bulkResponse = ElasticsearchUtils.saveBulkDocumentsForObject(client, index, dataList, true);
 			for (BulkItemResponse bulkItemResponse : bulkResponse.getItems()) {
 				System.out.println(bulkItemResponse.getResponse().getId());
 			}

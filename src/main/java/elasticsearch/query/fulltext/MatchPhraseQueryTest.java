@@ -12,7 +12,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 
-import elasticsearch.common.BaseDocument;
+import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -28,7 +28,7 @@ public class MatchPhraseQueryTest {
 		try {
 			String keyword = "easily";
 
-			List<BaseDocument> dataList = QueryTestUtils.englishList();
+			List<CommonData> dataList = QueryTestUtils.englishList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();

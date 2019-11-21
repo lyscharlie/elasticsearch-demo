@@ -11,7 +11,7 @@ import org.elasticsearch.index.query.RegexpQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import elasticsearch.common.BaseDocument;
+import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -27,7 +27,7 @@ public class RegexpQueryTest {
 			// List<BaseDocument> dataList = QueryTestUtils.englishList();
 
 			String keyword = ".*黑鸭绒.*";
-			List<BaseDocument> dataList = QueryTestUtils.chineseList();
+			List<CommonData> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();

@@ -1,14 +1,10 @@
 package elasticsearch.common;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
-public class BaseDocument {
+public abstract class BaseDocument {
 
-	private String id;
-
-	private Object object;
+	private String _id;
 
 }

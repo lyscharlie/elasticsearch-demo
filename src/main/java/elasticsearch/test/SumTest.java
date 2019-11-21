@@ -16,7 +16,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import com.alibaba.fastjson.JSONObject;
 
-import elasticsearch.common.BaseDocument;
+import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -25,7 +25,7 @@ public class SumTest {
 	public static void main(String[] args) {
 		try {
 
-			List<BaseDocument> dataList = QueryTestUtils.chineseList();
+			List<CommonData> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();

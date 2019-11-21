@@ -11,7 +11,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import elasticsearch.common.BaseDocument;
+import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -22,7 +22,7 @@ public class SearchArrayTest {
 			String keyword1 = "包邮";
 			String keyword2 = "定制专供";
 
-			List<BaseDocument> dataList = QueryTestUtils.chineseList();
+			List<CommonData> dataList = QueryTestUtils.chineseList();
 
 			String index = "demo_test";
 			String mappings = QueryTestUtils.mappings();

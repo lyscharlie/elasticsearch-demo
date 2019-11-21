@@ -14,7 +14,6 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import dataobject.CommonData;
-import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -58,7 +57,7 @@ public class DisjunctionMaxQueryTest {
 			words2.add("泸州老窖 60°泸州老窖泸州原浆珍品1500ml 三斤大坛酒");
 			words2.add("翠苑街道文三路477号华星科技大厦");
 
-			List<BaseDocument> dataList = new ArrayList<>();
+			List<CommonData> dataList = new ArrayList<>();
 			for (int i = 0; i < words1.size(); i++) {
 				CommonData data = new CommonData();
 				data.setName("test " + i);
@@ -66,7 +65,7 @@ public class DisjunctionMaxQueryTest {
 				data.setMark(words2.get(i));
 				data.setNumber(i);
 				data.setTime(new Date());
-				dataList.add(new BaseDocument(null, data));
+				dataList.add(data);
 			}
 
 			String index = "demo_test";

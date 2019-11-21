@@ -3,12 +3,13 @@ package dataobject;
 import java.util.Date;
 import java.util.List;
 
+import elasticsearch.common.BaseDocument;
 import lombok.Data;
 import lombok.ToString;
 
 @Data
 @ToString
-public class CommonData {
+public class CommonData extends BaseDocument {
 
 	private String code;
 

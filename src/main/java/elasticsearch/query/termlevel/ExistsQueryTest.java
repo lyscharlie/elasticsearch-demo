@@ -14,7 +14,6 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import dataobject.CommonData;
-import elasticsearch.common.BaseDocument;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
@@ -26,7 +25,7 @@ public class ExistsQueryTest {
 	public static void main(String[] args) {
 		try {
 
-			List<BaseDocument> dataList = new ArrayList<>();
+			List<CommonData> dataList = new ArrayList<>();
 			for (int i = 0; i < 10; i++) {
 				CommonData data = new CommonData();
 				data.setName("test " + i);
@@ -35,7 +34,7 @@ public class ExistsQueryTest {
 				}
 				data.setNumber(i);
 				data.setTime(new Date());
-				dataList.add(new BaseDocument(null, data));
+				dataList.add(data);
 
 				System.out.println(data.toString());
 			}

@@ -1,11 +1,12 @@
 package dataobject;
 
+import elasticsearch.common.BaseDocument;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class Student {
+public class Student extends BaseDocument {
 
 	private String name;
 

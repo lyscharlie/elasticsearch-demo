@@ -44,7 +44,7 @@ public class Test {
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", "test 1");
 			map.put("count", RandomUtils.nextInt(0, 100));
-			IndexResponse indexResponse = ElasticsearchUtils.saveDocument(client, index, new BaseDocument("1", map), true);
+			IndexResponse indexResponse = ElasticsearchUtils.saveDocumentById(client, index, "1", map, true);
 			String id = indexResponse.getId();
 			System.out.println(id);
 
@@ -53,15 +53,15 @@ public class Test {
 			System.out.println(result1);
 
 			// 批量新增数据
-			List<BaseDocument> dataList = new ArrayList<>();
+			List<Map<String, Object>> dataList = new ArrayList<>();
 			for (int i = 1; i <= 10; i++) {
 				Map<String, Object> dataMap = new HashMap<>();
 				map.put("id", i + "");
 				dataMap.put("name", "test " + i);
 				dataMap.put("count", RandomUtils.nextInt(0, 100));
-				dataList.add(new BaseDocument(null, map));
+				dataList.add(map);
 			}
-			String result3 = ElasticsearchUtils.saveBulkDocuments(client, index, dataList, true).toString();
+			String result3 = ElasticsearchUtils.saveBulkDocumentsForObject(client, index, dataList, true).toString();
 			System.out.println(result3);
 
 			// 查询
