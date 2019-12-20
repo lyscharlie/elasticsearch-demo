@@ -57,8 +57,9 @@ public class SumGroupByTest {
 
 			// 查询数据
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-			searchSourceBuilder.size(0);
+			searchSourceBuilder.size(20);
 			searchSourceBuilder.query(rangeQueryBuilder);
+			// searchSourceBuilder.postFilter(rangeQueryBuilder);// filter不支持
 			searchSourceBuilder.aggregation(termsAggregationBuilder);
 			System.out.println(searchSourceBuilder);
 
