@@ -50,8 +50,8 @@ public class CollapseByTest {
 
 			// 查询数据
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-			// searchSourceBuilder.from(0);
-			searchSourceBuilder.size(Integer.MAX_VALUE);
+			searchSourceBuilder.from(0);
+			searchSourceBuilder.size(10);
 			searchSourceBuilder.query(rangeQueryBuilder);
 			searchSourceBuilder.collapse(collapseBuilder);
 			System.out.println(searchSourceBuilder);
