@@ -16,6 +16,9 @@ import dataobject.CommonData;
 import elasticsearch.common.ElasticsearchUtils;
 import elasticsearch.query.QueryTestUtils;
 
+/**
+ * 字段折叠去重
+ */
 public class CollapseByTest {
 
 	public static void main(String[] args) {
@@ -46,7 +49,7 @@ public class CollapseByTest {
 			QueryTestUtils.line("完成写入");
 
 			RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("number").gte(5);
-			CollapseBuilder collapseBuilder = new CollapseBuilder("cat");
+			CollapseBuilder collapseBuilder = new CollapseBuilder("cat");// cat字段去重
 
 			// 查询数据
 			SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
