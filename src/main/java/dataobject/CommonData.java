@@ -31,4 +31,6 @@ public class CommonData extends BaseDocument {
 
 	private List<String> list;
 
+	private List<Integer> numList;
+
 }

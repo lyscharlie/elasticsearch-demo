@@ -123,6 +123,11 @@ public class QueryTestUtils {
 			data.setTime(DateUtils.addSeconds(new Date(), -1 * RandomUtils.nextInt(1, 10 * 24 * 60 * 60)));
 			data.setLocation(new GeoPoint(RandomUtils.nextDouble(0, 89), RandomUtils.nextDouble(0, 179)));
 
+			List<Integer> numList = new ArrayList<>();
+			numList.add(i);
+			numList.add(RandomUtils.nextInt(i + 1, 999));
+			data.setNumList(numList);
+
 			data.set_id(data.getCode());
 			dataList.add(data);
 

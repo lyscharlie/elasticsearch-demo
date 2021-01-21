@@ -35,6 +35,9 @@
     },
     "list": {
       "type": "keyword"
+    },
+    "numList": {
+      "type": "keyword"
     }
   }
 }
